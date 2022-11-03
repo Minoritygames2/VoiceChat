@@ -139,13 +139,10 @@ namespace VoiceChat
         {
             int size = 0;
             var playerId = BitConverter.ToInt32(packet, size);
-            Debug.Log("=== 테스트 시작  === RECEIVE ID : " + playerId);
             size += 4;
             var packetType = BitConverter.ToInt32(packet, size);
-            Debug.Log("=== 테스트 시작  === RECEIVE TYPE : " + packetType);
             size += 4;
             var channel = BitConverter.ToInt32(packet, size);
-            Debug.Log("=== 테스트 시작  === RECEIVE CHENNEL : " + channel);
             size += 4;
             var message = new byte[packet.Length - size];
             Buffer.BlockCopy(packet, size, message, 0,  packet.Length - size);
@@ -154,8 +151,7 @@ namespace VoiceChat
             if (playerId == 0)
                 ServerPacket(playerId, message);
             else
-                Debug.Log("=== 테스트 시작  === MESSAGE : " + BitConverter.ToInt32(message, 0));
-            //ClientPacket(playerId, packetType, message);
+                ClientPacket(playerId, packetType, message);
         }
 
         private void ServerPacket(int packetType, byte[] message)
