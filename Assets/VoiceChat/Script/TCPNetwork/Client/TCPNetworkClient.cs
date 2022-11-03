@@ -129,7 +129,7 @@ namespace VoiceChat
             else if (_isConnected == 1)
             {
                 Debug.Log("VoiceChat :: 네트워크 :: 클라이언트 접속 ");
-                OnClientConnected?.Invoke();
+                
             }
 
             _myStatus._isConnected = _isConnected;
@@ -163,6 +163,9 @@ namespace VoiceChat
                     var playerId = BitConverter.ToInt32(message, 0);
                     Debug.Log("voiceChat :: 플레이어 등록 " + playerId);
                     _tcpSession.VoiceClientStatus.PlayerId = playerId;
+
+                    //플레이어 등록이 되면 접속으로침
+                    OnClientConnected?.Invoke();
                     break;
                 default:
                     break;

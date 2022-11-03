@@ -61,7 +61,7 @@ namespace VoiceChat
 
             //TCP시작되면 마이크 캡쳐 시작
             _tcpClient.OnClientConnected.AddListener(() => {
-                //_micCtrl.StartCapture(micName, (voiceData)=> { _tcpClient.SendVoicePacket(voiceData); } );
+                _micCtrl.StartCapture(micName, (voiceData)=> { _tcpClient.SendVoicePacket(voiceData); } );
             });
             _tcpClient.OnReceiveVoicePacket.AddListener((voiceData)=> { _voiceClientRoom.SetVoiceData(voiceData); });
             _tcpClient.StartTcpClient(ipAddress);

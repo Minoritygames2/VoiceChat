@@ -64,7 +64,8 @@ namespace VoiceChat
             OnReceivePacket -= OnReceivePacket;
             for (int index = 0; index < _tcpClients.Count; index++)
                 _tcpClients[index].SessionClose();
-            _listener.Stop();
+            if(_listener != null)
+                _listener.Stop();
         }
     }
 
