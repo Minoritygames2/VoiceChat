@@ -30,6 +30,7 @@ namespace VoiceChat
         {
             var client = Instantiate(_playerPrefab, _playerTransform).GetComponent<VoiceClient>();
             client.StartVoiceClient(networkId);
+            _voiceClients.Add(client);
             return client;
         }
 
