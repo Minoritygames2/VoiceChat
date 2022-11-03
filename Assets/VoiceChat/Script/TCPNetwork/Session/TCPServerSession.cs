@@ -102,6 +102,13 @@ namespace VoiceChat
                 if (_tcpClients[index].Client.IsConnected())
                     _tcpClients[index].Client.SendPacket(packet);
         }
+
+        private void OnDestroy()
+        {
+            for (int index = 0; index < _tcpClients.Count; index++)
+                if (_tcpClients[index].Client.IsConnected())
+                    _tcpClients[index].Client.SessionClose();
+        }
     }
 }
 
