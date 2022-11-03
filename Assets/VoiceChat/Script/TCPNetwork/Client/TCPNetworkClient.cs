@@ -149,14 +149,13 @@ namespace VoiceChat
 
             
             if (playerId == 0)
-                ServerPacket(playerId, message);
+                ServerPacket(packetType, message);
             else
                 ClientPacket(playerId, packetType, message);
         }
 
         private void ServerPacket(int packetType, byte[] message)
         {
-            Debug.Log("Message : " + ((VoicePacketType)packetType).ToString());
             switch((VoicePacketType)packetType)
             {
                 case VoicePacketType.ACCEPT:
