@@ -24,7 +24,7 @@ namespace VoiceChat
         private Text _txtDetectedTime;
 
         [SerializeField]
-        private TCPNetworkRoom _tcpRoom;
+        private TCPNetworkListener _tcpListener;
         private UDPNetworkSender _udpSender = new UDPNetworkSender();
 
         //서버 찾기 대기시간
@@ -55,7 +55,7 @@ namespace VoiceChat
                 return;
             }
 
-            _tcpRoom.StartTCPListener(portNo, OnStartedServer);
+            _tcpListener.StartTCPListener(portNo, OnStartedServer);
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace VoiceChat
 
         private void OnDestroy()
         {
-            _tcpRoom.StopTCPListener();
+            _tcpListener.StopTCPListener();
             if(_isSearch)
                 _udpSender.StopUDPSender();
         }

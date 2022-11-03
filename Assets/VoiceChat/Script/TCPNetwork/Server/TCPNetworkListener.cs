@@ -7,20 +7,17 @@ using UnityEngine;
 using UnityEngine.Events;
 namespace VoiceChat
 {
-    public class TCPNetworkListener
+    public class TCPNetworkListener : MonoBehaviour
     {
-        public delegate void TCPSessionEvent(TCPSession tcpSession);
-        public TCPSessionEvent OnClientConnect;
-        public TCPSession.PacketEvent OnReceivePacket;
+        private UnityEvent ServerStartedEvent = new UnityEvent();
         private TcpListener _listener;
-        private List<TCPSession> _tcpClients = new List<TCPSession>();
-
-        public void StartTcpListener(int port, UnityAction ServerStartedEvent, TCPSessionEvent onClientConnect, TCPSession.PacketEvent receivePacket)
+        [SerializeField]
+        private TCPServerSession _tcpServerSession;
+        public void StartTCPListener(int port, UnityAction ServerStartedEvent)
         {
             Debug.Log("VoiceChat :: 네트워크 :: TCP 서버를 실행합니다");
-            
-            OnClientConnect = onClientConnect;
-            OnReceivePacket = receivePacket;
+            this.ServerStartedEvent.RemoveAllListeners();
+            this.ServerStartedEvent.AddListener(ServerStartedEvent);
 
             _listener = new TcpListener(IPAddress.Any, port);
             _listener.Start();
@@ -29,16 +26,20 @@ namespace VoiceChat
             ServerStartedEvent?.Invoke();
         }
 
+        public void StopTCPListener()
+        {
+            if (_listener != null)
+                _listener.Stop();
+        }
+
         private void AcceptCallback(IAsyncResult asyncResult)
         {
             try
             {
                 var listener = (TcpListener)asyncResult.AsyncState;
                 var client = listener.EndAcceptTcpClient(asyncResult);
-                var tcpSession = new TCPSession(client.Client, (packet) => {  }, (packet) => { OnReceivePacket?.Invoke(packet); });
-                _tcpClients.Add(tcpSession);
 
-                OnClientConnect?.Invoke(tcpSession);
+                _tcpServerSession.AddPlayer(client);
             }
             catch (Exception e)
             {
@@ -50,23 +51,9 @@ namespace VoiceChat
             }
         }
 
-        public void SendAllClients(ArraySegment<byte> packet)
-        {
-            Debug.Log("Server : SendAllClients");
-            for (int index = 0; index < _tcpClients.Count; index++)
-                if (_tcpClients[index].IsConnected())
-                    _tcpClients[index].SendPacket(packet);
-        }
+        
 
-        public void StopTCPListener()
-        {
-            OnClientConnect -= OnClientConnect;
-            OnReceivePacket -= OnReceivePacket;
-            for (int index = 0; index < _tcpClients.Count; index++)
-                _tcpClients[index].SessionClose();
-            if(_listener != null)
-                _listener.Stop();
-        }
+        
     }
 
 }
