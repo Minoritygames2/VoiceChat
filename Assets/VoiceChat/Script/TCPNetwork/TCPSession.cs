@@ -106,13 +106,9 @@ namespace VoiceChat
             Buffer.BlockCopy(playerIdByte, 0, rsltBuffer.Array, nowPosition, playerIdByte.Length);
             nowPosition += playerIdByte.Length;
 
-            Debug.Log("Player Id : " + _voiceClientStatus.PlayerId);
-
             var packetTypeByte = BitConverter.GetBytes(packetType);
             Buffer.BlockCopy(packetTypeByte, 0, rsltBuffer.Array, nowPosition, packetTypeByte.Length);
             nowPosition += packetTypeByte.Length;
-
-            Debug.Log("packetType : " + packetType);
 
             var channel = BitConverter.GetBytes(_voiceClientStatus.Channel);
             Buffer.BlockCopy(channel, 0, rsltBuffer.Array, nowPosition, channel.Length);
