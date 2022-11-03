@@ -68,31 +68,32 @@ namespace VoiceChat
 
         private IEnumerator SendVoice(UnityAction<VoiceData> SendPacket)
         {
-            while (_isStartCapture)
+            _voiceID++;
+            if (_voiceID > 10000)
+                _voiceID = 0;
+
+            var voiceValues = new float[44100];
+            _micAudioSource.clip.GetData(voiceValues, Microphone.GetPosition(_settingMicName));
+
+            for (int index = 0; index < 3; index++)
             {
-                _voiceID++;
-                if (_voiceID > 10000)
-                    _voiceID = 0;
+                var byteValue = new byte[voiceValues.Length * 4 / 3];
 
-                var voiceValues = new float[44100];
-                _micAudioSource.clip.GetData(voiceValues, Microphone.GetPosition(_settingMicName));
-
-                for (int index = 0; index < 3; index++)
+                var byteValueIndex = 0;
+                for (int voiceValueIndex = voiceValues.Length / 3 * index; voiceValueIndex < voiceValues.Length / 3 * (index + 1); voiceValueIndex++)
                 {
-                    var byteValue = new byte[voiceValues.Length * 4 / 3];
-
-                    var byteValueIndex = 0;
-                    for (int voiceValueIndex = voiceValues.Length / 3 * index; voiceValueIndex < voiceValues.Length / 3 * (index + 1); voiceValueIndex++)
-                    {
-                        var data = BitConverter.GetBytes(voiceValues[voiceValueIndex]);
-                        Array.Copy(data, 0, byteValue, byteValueIndex, 4);
-                        byteValueIndex += 4;
-                    }
-
-                    SendPacket?.Invoke(new VoiceData() { voiceID = _voiceID, voiceIndex = index, voiceArray = byteValue });
+                    var data = BitConverter.GetBytes(voiceValues[voiceValueIndex]);
+                    Array.Copy(data, 0, byteValue, byteValueIndex, 4);
+                    byteValueIndex += 4;
                 }
-                yield return _wait;
+
+                SendPacket?.Invoke(new VoiceData() { voiceID = _voiceID, voiceIndex = index, voiceArray = byteValue });
             }
+            yield return _wait;
+            //while (_isStartCapture)
+            //{
+            //    
+            //}
 
         }
 

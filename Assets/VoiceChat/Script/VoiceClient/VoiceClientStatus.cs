@@ -19,6 +19,7 @@ namespace VoiceChat
 
     public enum VoicePacketType
     {
+        UNKNOWN,
         ACCEPT,
         CONNECT_REQUEST,
         CONNECT_RESPONCE,

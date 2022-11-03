@@ -74,9 +74,9 @@ namespace VoiceChat
         /// <summary>
         /// 클라이언트 패킷송신
         /// </summary>
-        public void SendPacket(byte[] buffer)
+        public void SendPacket(VoicePacketType packetType ,byte[] buffer)
         {
-            _tcpSession.SendPacket(0, buffer);
+            _tcpSession.SendPacket((int)packetType, buffer);
         }
 
         public void SendVoicePacket(VoiceData voiceData)
