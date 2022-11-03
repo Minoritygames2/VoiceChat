@@ -94,6 +94,7 @@ namespace VoiceChat
 
         public void SendPacket(ArraySegment<byte> buffer)
         {
+            Debug.Log("SendPacket count : " + buffer.Count);
             IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
             bufferList.Add(buffer);
             _socket.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), _socket);
@@ -152,6 +153,9 @@ namespace VoiceChat
                 AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
                 var rslt = asyncObj.receiveObj[0];
                 var rsltSize = asyncObj.socket.EndReceive(asyncResult);
+
+                Debug.Log("Receive count : " + rslt.Count + " : " + rsltSize);
+
                 if (rsltSize > 0)
                 {
                     OnPacketReceived?.Invoke(new ArraySegment<byte>(rslt.Array));
