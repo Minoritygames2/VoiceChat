@@ -64,6 +64,7 @@ namespace VoiceChat
             var rsltCloseBuffer = _sendBuffer.CloseBuffer(nowPosition);
             Buffer.BlockCopy(rsltBuffer.Array, 0, rsltCloseBuffer.Array, 0, rsltCloseBuffer.Count);
 
+            Debug.Log(@"=== 테스트 시작  === SEND");
             SendPacket(rsltCloseBuffer);
         }
 
@@ -103,15 +104,21 @@ namespace VoiceChat
         private ArraySegment<byte> MakeHeader(int packetType, ArraySegment<byte> rsltBuffer, out int nowPosition)
         {
             nowPosition = 0;
-            var playerIdByte = BitConverter.GetBytes(_voiceClientStatus.PlayerId);
+            Debug.Log(@"=== 테스트 시작  === ID 임시 417");
+            //var playerIdByte = BitConverter.GetBytes(_voiceClientStatus.PlayerId);
+            var playerIdByte = BitConverter.GetBytes(417);
             Buffer.BlockCopy(playerIdByte, 0, rsltBuffer.Array, nowPosition, playerIdByte.Length);
             nowPosition += playerIdByte.Length;
 
-            var packetTypeByte = BitConverter.GetBytes(packetType);
+            Debug.Log(@"=== 테스트 시작  === TYPE 임시 3");
+            //var packetTypeByte = BitConverter.GetBytes(packetType);
+            var packetTypeByte = BitConverter.GetBytes(3);
             Buffer.BlockCopy(packetTypeByte, 0, rsltBuffer.Array, nowPosition, packetTypeByte.Length);
             nowPosition += packetTypeByte.Length;
 
-            var channel = BitConverter.GetBytes(_voiceClientStatus.Channel);
+            Debug.Log(@"=== 테스트 시작  === Channel 임시 7");
+            //var channel = BitConverter.GetBytes(_voiceClientStatus.Channel);
+            var channel = BitConverter.GetBytes(7);
             Buffer.BlockCopy(channel, 0, rsltBuffer.Array, nowPosition, channel.Length);
             nowPosition += packetTypeByte.Length;
             return rsltBuffer;

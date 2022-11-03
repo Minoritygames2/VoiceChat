@@ -23,8 +23,12 @@ namespace VoiceChat
             //플레이어 +1하고 플레이어에게 ID값 보내기
             _playerIndex += 1;
 
-            tcpSession.SendPacket((int)VoicePacketType.ACCEPT, BitConverter.GetBytes(_playerIndex));
-            Debug.Log("VoiceChat :: 플레이어가 접속되었습니다 :: " + _playerIndex);
+            //TODO : TEST
+            Debug.Log("=== 테스트 시작 1 ===");
+            tcpSession.SendPacket((int)VoicePacketType.ACCEPT, BitConverter.GetBytes(84654641));
+
+            //tcpSession.SendPacket((int)VoicePacketType.ACCEPT, BitConverter.GetBytes(_playerIndex));
+            //Debug.Log("VoiceChat :: 플레이어가 접속되었습니다 :: " + _playerIndex);
         }
 
 
