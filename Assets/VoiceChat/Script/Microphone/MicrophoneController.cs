@@ -14,7 +14,7 @@ namespace VoiceChat
         private string _settingMicName = string.Empty;
 
         private bool _isStartCapture = false;
-        private WaitForSeconds _wait = new WaitForSeconds(5f);
+        private WaitForSeconds _wait = new WaitForSeconds(10f);
 
         private int _voiceID = 0;
         /// <summary>
@@ -151,7 +151,7 @@ namespace VoiceChat
                         Array.Copy(data, 0, byteValue, byteValueIndex, 4);
                         byteValueIndex += 4;
                     }
-
+                    Debug.Log("SendPacket VoiceID : " + _voiceID + " voiceIndex : " + byteValue.Length);
                     SendPacket?.Invoke(new VoiceData() { voiceID = _voiceID, voiceIndex = index, voiceArray = byteValue });
                 }
                 yield return _wait;

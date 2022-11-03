@@ -45,18 +45,17 @@ namespace VoiceChat
         {
             if (voiceArray.Length <= 0)
                 return;
-
             if (voiceID != _nowVoiceId)
             {
                 _nowVoiceId = voiceID;
                 _voiceByteDatas.Clear();
             }
-
             _voiceByteDatas.Add(new VoiceData() { voiceID = voiceID, voiceIndex = voiceIndex, voiceArray = voiceArray });
 
             if (CheckContainsIndex())
             {
-                var receivedFloatData = new float[50000];
+                Debug.Log("in CheckContainsIndex 1");
+                var receivedFloatData = new float[GetTotalDataLength() / 4];
                 int nowPosition = 0;
                 for (int index = 0; index < 3; index++)
                 {
@@ -72,11 +71,9 @@ namespace VoiceChat
                     Buffer.BlockCopy(floatIndexData, 0, receivedFloatData, nowPosition, floatIndexData.Length);
                     nowPosition += floatIndexData.Length;
                 }
-                var rsltVoiceData = new float[nowPosition];
-                Buffer.BlockCopy(receivedFloatData, 0, rsltVoiceData, 0, nowPosition);
-                _audioSource.clip.SetData(rsltVoiceData, 0);
+                _audioSource.clip.SetData(receivedFloatData, 0);
                 _audioSource.Play();
-
+                Debug.Log("in CheckContainsIndex 2");
                 /*
                 float[] spectrum = new float[256];
                 _audioSource.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
@@ -103,6 +100,13 @@ namespace VoiceChat
             return (_voiceByteDatas.Any(_ => _.voiceIndex == 0) &&
                 _voiceByteDatas.Any(_ => _.voiceIndex == 1) &&
                 _voiceByteDatas.Any(_ => _.voiceIndex == 2));
+        }
+        private int GetTotalDataLength()
+        {
+            int arrayCount = 0;
+            for (int index = 0; index < _voiceByteDatas.Count; index++)
+                arrayCount += _voiceByteDatas[index].voiceArray.Length;
+            return arrayCount;
         }
 
         private byte[] GetVoiceData(int correctIndex)

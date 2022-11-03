@@ -188,8 +188,6 @@ namespace VoiceChat
 
         private void ParseVoicePacket(int playerId, byte[] message)
         {
-            ArraySegment<byte> packet = new ArraySegment<byte>(message,0,message.Length);
-
             int size = 0;
             var voiceId = BitConverter.ToInt32(message, size);
             size += 4;
@@ -198,7 +196,6 @@ namespace VoiceChat
             size += 4;
             var voicePacket = new byte[message.Length - size];
             Buffer.BlockCopy(message, size, voicePacket, 0, message.Length - size);
-
             OnReceiveVoicePacket?.Invoke(new VoiceData() { networkId = playerId, voiceID = voiceId, voiceIndex = voiceIndex, voiceArray = voicePacket });
         }
         #endregion
