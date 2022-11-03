@@ -19,10 +19,9 @@ namespace VoiceChat
             return (bufferSize > GetRemainSize());
         }
 
-        public ArraySegment<byte> OpenBuffer(int bufferSize)
+        public ArraySegment<byte> OpenBuffer()
         {
-            _writePosition = 0;
-            return new ArraySegment<byte>(_buffer, _writePosition, bufferSize);
+            return new ArraySegment<byte>(_buffer, 0, _buffer.Length);
         }
 
         public ArraySegment<byte> CloseBuffer(int bufferSize)

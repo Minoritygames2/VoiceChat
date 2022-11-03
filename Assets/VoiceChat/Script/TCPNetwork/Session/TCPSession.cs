@@ -55,35 +55,9 @@ namespace VoiceChat
         {
             int nowPosition = 0;
             var sendBuffer = new TCPSendBuffer(4096 * 100);
-            var rsltBuffer = MakeHeader(packetType, sendBuffer.OpenBuffer(4048), out nowPosition);
+            var rsltBuffer = MakeHeader(packetType, sendBuffer.OpenBuffer(), out nowPosition);
             Buffer.BlockCopy(buffer, 0, rsltBuffer.Array, nowPosition, buffer.Length);
             nowPosition += buffer.Length;
-            var rsltCloseBuffer = sendBuffer.CloseBuffer(nowPosition);
-            Buffer.BlockCopy(rsltBuffer.Array, 0, rsltCloseBuffer.Array, 0, rsltCloseBuffer.Count);
-
-            SendPacket(rsltCloseBuffer);
-        }
-
-        /// <summary>
-        /// voice Packet
-        /// </summary>
-        public void SendPacket(VoiceData voiceData)
-        {
-            int nowPosition = 0;
-            var sendBuffer = new TCPSendBuffer(4096 * 100);
-            var rsltBuffer = MakeHeader((int)VoicePacketType.VOICE, sendBuffer.OpenBuffer(60000), out nowPosition);
-
-            var voiceIdByte = BitConverter.GetBytes(voiceData.voiceID);
-            Buffer.BlockCopy(voiceIdByte, 0, rsltBuffer.Array, nowPosition, voiceIdByte.Length);
-            nowPosition += voiceIdByte.Length;
-
-            var voiceIndex = BitConverter.GetBytes(voiceData.voiceIndex);
-            Buffer.BlockCopy(voiceIndex, 0, rsltBuffer.Array, nowPosition, voiceIndex.Length);
-            nowPosition += voiceIndex.Length;
-
-            Buffer.BlockCopy(voiceData.voiceArray, 0, rsltBuffer.Array, nowPosition, voiceData.voiceArray.Length);
-            nowPosition += voiceData.voiceArray.Length;
-
             var rsltCloseBuffer = sendBuffer.CloseBuffer(nowPosition);
             Buffer.BlockCopy(rsltBuffer.Array, 0, rsltCloseBuffer.Array, 0, rsltCloseBuffer.Count);
 
@@ -147,6 +121,7 @@ namespace VoiceChat
             {
                 if (!_isConnected)
                     return;
+                StartClientBeginReceive();
                 AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
                 var rslt = asyncObj.receiveObj[0];
                 var rsltSize = asyncObj.socket.EndReceive(asyncResult);
@@ -161,11 +136,6 @@ namespace VoiceChat
             catch (Exception e)
             {
                 Debug.Log("VoiceChat :: 네트워크 :: 수신 에러 :: " + e.Message);
-            }
-            finally
-            {
-                if (_isConnected)
-                    StartClientBeginReceive();
             }
         }
     }
