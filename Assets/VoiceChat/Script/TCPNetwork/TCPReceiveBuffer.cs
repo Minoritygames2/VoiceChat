@@ -16,8 +16,11 @@ public class TCPReceiveBuffer
         return new ArraySegment<byte>(_buffer.Array, 0, _buffer.Count);
     }
 
-    public ArraySegment<byte> GetReadSegment(byte[] rsltArray)
+    public ArraySegment<byte> GetReadSegment(byte[] sourceArray, int bufferlength)
     {
-        return new ArraySegment<byte>(rsltArray);
+        var rsltByte = new byte[bufferlength];
+        Buffer.BlockCopy(sourceArray, 0, rsltByte, 0, bufferlength);
+        _buffer = new ArraySegment<byte>(rsltByte);
+        return _buffer;
     }
 }

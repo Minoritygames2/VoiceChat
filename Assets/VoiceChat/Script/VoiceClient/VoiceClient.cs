@@ -54,10 +54,10 @@ namespace VoiceChat
 
             _voiceByteDatas.Add(new VoiceData() { voiceID = voiceID, voiceIndex = voiceIndex, voiceArray = voiceArray });
 
-
-            if(CheckContainsIndex())
+            if (CheckContainsIndex())
             {
-                var receivedFloatData = new float[44100];
+                var receivedFloatData = new float[50000];
+                int nowPosition = 0;
                 for (int index = 0; index < 3; index++)
                 {
                     byte[] byteIndexData = GetVoiceData(index);
@@ -69,9 +69,12 @@ namespace VoiceChat
                     {
                         floatIndexData[byteDataIndex] = BitConverter.ToSingle(byteIndexData, byteDataIndex * 4);
                     }
-                    Array.Copy(floatIndexData, 0, receivedFloatData, floatIndexData.Length * index, floatIndexData.Length);
+                    Buffer.BlockCopy(floatIndexData, 0, receivedFloatData, nowPosition, floatIndexData.Length);
+                    nowPosition += floatIndexData.Length;
                 }
-                _audioSource.clip.SetData(receivedFloatData, 0);
+                var rsltVoiceData = new float[nowPosition];
+                Buffer.BlockCopy(receivedFloatData, 0, rsltVoiceData, 0, nowPosition);
+                _audioSource.clip.SetData(rsltVoiceData, 0);
                 _audioSource.Play();
 
                 /*
