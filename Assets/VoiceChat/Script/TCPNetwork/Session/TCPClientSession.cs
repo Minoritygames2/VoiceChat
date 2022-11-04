@@ -62,9 +62,8 @@ namespace VoiceChat
                         {
                             CheckPacket(_receiveBuffer.GetBuffer().Array);
                         }
-                        
-                        Interlocked.Exchange(ref _isAlbleReceiveQueue, INT_ENABLE_RECEIVE);
                     }
+                    Interlocked.Exchange(ref _isAlbleReceiveQueue, INT_ENABLE_RECEIVE);
                 }
             }
 
