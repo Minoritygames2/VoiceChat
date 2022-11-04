@@ -13,6 +13,7 @@ namespace VoiceChat
         public int networkId;
         public int voiceID;
         public int voiceIndex;
+        public int timeSamples;
         public byte[] voiceArray;
     }
     public class VoiceClient : MonoBehaviour
@@ -34,13 +35,13 @@ namespace VoiceChat
         public void StartVoiceClient(int networkId)
         {
             _networkId = networkId;
-            _audioSource.clip = AudioClip.Create(string.Format("{0}_Voice", _networkId), 44100, 10, 44100, false);
+            _audioSource.clip = AudioClip.Create(string.Format("{0}_Voice", _networkId), 44100, 0, 44100, false);
             _audioSource.loop = true;
             _audioSource.mute = false;
             _audioSource.Play();
         }
 
-        public void SetVoiceData(byte[] voiceArray, int voiceID, int voiceIndex)
+        public void SetVoiceData(byte[] voiceArray, int voiceID, int voiceIndex, int timeSample)
         {
             if (voiceArray.Length <= 0)
                 return;
@@ -70,7 +71,7 @@ namespace VoiceChat
                     Buffer.BlockCopy(floatIndexData, 0, receivedFloatData, nowPosition, floatIndexData.Length);
                     nowPosition += floatIndexData.Length;
                 }
-                _audioSource.clip.SetData(receivedFloatData, _audioSource.timeSamples);
+                _audioSource.clip.SetData(receivedFloatData, timeSample);
                 //_audioSource.Play();
                 /*
                 float[] spectrum = new float[256];

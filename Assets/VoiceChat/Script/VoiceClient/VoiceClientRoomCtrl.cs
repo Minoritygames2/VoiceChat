@@ -21,7 +21,7 @@ namespace VoiceChat
             else
                 client = GetClient(voiceData.networkId);
 
-            client.SetVoiceData(voiceData.voiceArray, voiceData.voiceID, voiceData.voiceIndex);
+            client.SetVoiceData(voiceData.voiceArray, voiceData.voiceID, voiceData.voiceIndex, voiceData.timeSamples);
         }
 
         public VoiceClient AddVoiceClient(int networkId)

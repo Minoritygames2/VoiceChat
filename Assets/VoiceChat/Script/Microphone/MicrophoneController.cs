@@ -133,7 +133,6 @@ namespace VoiceChat
         {
             while (_isStartCapture)
             {
-                int testOffset = 0;
                 _voiceID++;
                 if (_voiceID > 10000)
                     _voiceID = 0;
@@ -141,7 +140,6 @@ namespace VoiceChat
                 var voiceValues = new float[44100];
                 
                 _micAudioSource.clip.GetData(voiceValues, _micAudioSource.timeSamples);
-
                 Debug.Log(_micAudioSource.timeSamples);
 
                 for (int index = 0; index < 3; index++)
@@ -155,8 +153,7 @@ namespace VoiceChat
                         Array.Copy(data, 0, byteValue, byteValueIndex, 4);
                         byteValueIndex += 4;
                     }
-                    Debug.Log("SendPacket VoiceID : " + _voiceID + " voiceIndex : " + byteValue.Length);
-                    SendPacket?.Invoke(new VoiceData() { voiceID = _voiceID, voiceIndex = index, voiceArray = byteValue });
+                    SendPacket?.Invoke(new VoiceData() { voiceID = _voiceID, voiceIndex = index, timeSamples = _micAudioSource.timeSamples, voiceArray = byteValue });
                 }
                 yield return _wait;
             }

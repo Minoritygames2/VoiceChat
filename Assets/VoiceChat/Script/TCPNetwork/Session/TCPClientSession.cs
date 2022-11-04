@@ -142,9 +142,13 @@ namespace VoiceChat
 
             var voiceIndex = BitConverter.ToInt32(message, size);
             size += 4;
+
+            var timeSamples = BitConverter.ToInt32(message, size);
+            size += 4;
+
             var voicePacket = new byte[message.Length - size];
             Buffer.BlockCopy(message, size, voicePacket, 0, message.Length - size);
-            OnReceiveVoicePacket?.Invoke(new VoiceData() { networkId = playerId, voiceID = voiceId, voiceIndex = voiceIndex, voiceArray = voicePacket });
+            OnReceiveVoicePacket?.Invoke(new VoiceData() { networkId = playerId, voiceID = voiceId, timeSamples = timeSamples, voiceIndex = voiceIndex, voiceArray = voicePacket });
         }
 
         /// <summary>
@@ -162,6 +166,10 @@ namespace VoiceChat
             var voiceIndex = BitConverter.GetBytes(voiceData.voiceIndex);
             Buffer.BlockCopy(voiceIndex, 0, voiceBuffer.Array, nowPosition, voiceIndex.Length);
             nowPosition += voiceIndex.Length;
+
+            var timeSamples = BitConverter.GetBytes(voiceData.timeSamples);
+            Buffer.BlockCopy(voiceIndex, 0, voiceBuffer.Array, nowPosition, timeSamples.Length);
+            nowPosition += timeSamples.Length;
 
             Buffer.BlockCopy(voiceData.voiceArray, 0, voiceBuffer.Array, nowPosition, voiceData.voiceArray.Length);
             nowPosition += voiceData.voiceArray.Length;
