@@ -27,14 +27,14 @@ namespace VoiceChat
         private List<VoiceData> _voiceByteDatas = new List<VoiceData>();
 
         private int _timer = 0;
-        private WaitForSeconds _wait = new WaitForSeconds(1f);
+        private WaitForSeconds _wait = new WaitForSeconds(0.2f);
         /// <summary>
         /// 다른 클라이언트로 받은 Voice 시작
         /// </summary>
         public void StartVoiceClient(int networkId)
         {
             _networkId = networkId;
-            _audioSource.clip = AudioClip.Create(string.Format("{0}_Voice", _networkId), 44100, 1, 44100, false);
+            _audioSource.clip = AudioClip.Create(string.Format("{0}_Voice", _networkId), 44100, 10, 44100, false);
             _audioSource.loop = true;
             _audioSource.mute = false;
             _audioSource.Play();
