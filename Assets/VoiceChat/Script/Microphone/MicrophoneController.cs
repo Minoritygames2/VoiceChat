@@ -14,7 +14,7 @@ namespace VoiceChat
         private string _settingMicName = string.Empty;
 
         private bool _isStartCapture = false;
-        private WaitForSeconds _wait = new WaitForSeconds(10f);
+        private WaitForSeconds _wait = new WaitForSeconds(1f);
 
         private int _voiceID = 0;
         /// <summary>
@@ -133,12 +133,16 @@ namespace VoiceChat
         {
             while (_isStartCapture)
             {
+                int testOffset = 0;
                 _voiceID++;
                 if (_voiceID > 10000)
                     _voiceID = 0;
 
                 var voiceValues = new float[44100];
-                _micAudioSource.clip.GetData(voiceValues, 0);
+                
+                _micAudioSource.clip.GetData(voiceValues, _micAudioSource.timeSamples);
+
+                Debug.Log(_micAudioSource.timeSamples);
 
                 for (int index = 0; index < 3; index++)
                 {

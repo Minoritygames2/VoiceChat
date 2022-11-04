@@ -15,8 +15,6 @@ namespace VoiceChat
 
         public void SetVoiceData(VoiceData voiceData)
         {
-            Debug.Log("다른 클라이언트 접속 :: " + voiceData.networkId);
-            Debug.Log("다른 클라이언트 접속 :: " + IsHasClient(voiceData.networkId));
             VoiceClient client;
             if (!IsHasClient(voiceData.networkId))
                 client = AddVoiceClient(voiceData.networkId);

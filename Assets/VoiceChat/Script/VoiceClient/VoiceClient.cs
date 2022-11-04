@@ -33,7 +33,6 @@ namespace VoiceChat
         /// </summary>
         public void StartVoiceClient(int networkId)
         {
-            Debug.Log("새로운 클라이언트가 접속되었습니다.");
             _networkId = networkId;
             _audioSource.clip = AudioClip.Create(string.Format("{0}_Voice", _networkId), 44100, 1, 44100, false);
             _audioSource.loop = true;
@@ -50,11 +49,11 @@ namespace VoiceChat
                 _nowVoiceId = voiceID;
                 _voiceByteDatas.Clear();
             }
+            Debug.Log("_nowVoiceId : " + _nowVoiceId);
             _voiceByteDatas.Add(new VoiceData() { voiceID = voiceID, voiceIndex = voiceIndex, voiceArray = voiceArray });
 
             if (CheckContainsIndex())
             {
-                Debug.Log("in CheckContainsIndex 1");
                 var receivedFloatData = new float[GetTotalDataLength() / 4];
                 int nowPosition = 0;
                 for (int index = 0; index < 3; index++)
@@ -73,7 +72,6 @@ namespace VoiceChat
                 }
                 _audioSource.clip.SetData(receivedFloatData, 0);
                 _audioSource.Play();
-                Debug.Log("in CheckContainsIndex 2");
                 /*
                 float[] spectrum = new float[256];
                 _audioSource.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
