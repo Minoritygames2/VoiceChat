@@ -11,8 +11,15 @@ namespace VoiceChat
         [SerializeField]
         private GameObject _playerPrefab;
 
+        [SerializeField]
+        private ClientRoomCanvas _roomCanvasCtrl;
+
         List<VoiceClient> _voiceClients = new List<VoiceClient>();
 
+        public void StartVoiceRoom()
+        {
+
+        }
         public void SetVoiceData(VoiceData voiceData)
         {
             VoiceClient client;

@@ -9,10 +9,10 @@ namespace VoiceChat
     {
         [Header("Canvas")]
         [SerializeField]
-        private ClientSettingController _settingCtrl;
+        private ClientSettingCanvas _settingCanvas;
 
         [SerializeField]
-        private ClientRoomController _roomCtrl;
+        private ClientRoomCanvas _roomCtrl;
 
         [Header("Module")]
         [SerializeField]
@@ -35,13 +35,13 @@ namespace VoiceChat
 
         public void StartSetting()
         {
-            _settingCtrl.ActiveSettingArea(
+            _settingCanvas.ActiveSettingArea(
                 //마이크 설정 버튼 클릭이벤트
                 _micCtrl.SearchMicDevices,
                 //서버 서치 버튼 클릭
                 (port) =>
                 {
-                    _udpReceiver.StartUDPBroadcastReceiver(port, _settingCtrl.OnSearchedServer);
+                    _udpReceiver.StartUDPBroadcastReceiver(port, _settingCanvas.OnSearchedServer);
                 },
                 //서버 서치 타임아웃
                 () => 
@@ -56,7 +56,7 @@ namespace VoiceChat
         {
             Debug.Log("세팅값 : MicName : " + micName + " ipAddress : " + ipAddress);
             //SettingArea 끄기
-            _settingCtrl.UnactiveSettingArea();
+            _settingCanvas.UnactiveSettingArea();
             _roomCtrl.ActiveRoomArea(ipAddress);
 
             //TCP시작되면 마이크 캡쳐 시작

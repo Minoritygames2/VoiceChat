@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace VoiceChat
 {
-    public class ClientRoomController : MonoBehaviour
+    public class ClientRoomCanvas : MonoBehaviour
     {
         [SerializeField]
         private Text _txtServerIp;

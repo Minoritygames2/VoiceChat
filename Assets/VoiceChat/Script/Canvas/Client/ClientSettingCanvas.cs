@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace VoiceChat
 {
-    public class ClientSettingController : MonoBehaviour
+    public class ClientSettingCanvas : MonoBehaviour
     {
         public class EndSettingEvent : UnityEvent<string, string> { }
         private EndSettingEvent _endSettingCallback = new EndSettingEvent();
