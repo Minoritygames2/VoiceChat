@@ -56,11 +56,14 @@ namespace VoiceChat
                 if (Interlocked.CompareExchange(ref _isAlbleReceiveQueue, INT_UNABLE_RECEIVE, INT_ENABLE_RECEIVE) == INT_UNABLE_RECEIVE)
                 {
                     ArraySegment<byte> result;
-                    while (_receiveQueue.TryDequeue(out result))
+                    while(_receiveQueue.Count > 0)
                     {
-                        if(_receiveBuffer.SetBuffer(result))
+                        while (_receiveQueue.TryDequeue(out result))
                         {
-                            CheckPacket(_receiveBuffer.GetBuffer().Array);
+                            if (_receiveBuffer.SetBuffer(result))
+                            {
+                                CheckPacket(_receiveBuffer.GetBuffer().Array);
+                            }
                         }
                     }
                     Interlocked.Exchange(ref _isAlbleReceiveQueue, INT_ENABLE_RECEIVE);

@@ -56,7 +56,7 @@ public class TCPReceiveBuffer
         Buffer.BlockCopy(_buffer.Array, _packetSize, remainBuffer.Array, 0, _buffer.Count - _packetSize);
         _buffer = remainBuffer;
 
-        _remainSize = _buffer.Count - _packetSize;
+        _remainSize -= _packetSize;
 
         _packetSize = 0;
 
