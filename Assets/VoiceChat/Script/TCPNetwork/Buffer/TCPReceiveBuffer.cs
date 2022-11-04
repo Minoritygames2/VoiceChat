@@ -56,7 +56,7 @@ public class TCPReceiveBuffer
         Buffer.BlockCopy(_buffer.Array, _packetSize, remainBuffer.Array, 0, _buffer.Count - _packetSize);
         _buffer = remainBuffer;
 
-        _remainSize -= _packetSize;
+        _remainSize = _buffer.Count - _packetSize;
 
         _packetSize = 0;
 
@@ -65,5 +65,6 @@ public class TCPReceiveBuffer
     private void GetPacketSize(byte[] receiveByte)
     {
         _packetSize = BitConverter.ToInt32(receiveByte, 0);
+        Debug.Log("_packetSize : " + _packetSize);
     }
 }
