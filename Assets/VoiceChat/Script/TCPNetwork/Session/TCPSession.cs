@@ -129,8 +129,6 @@ namespace VoiceChat
                 var rslt = asyncObj.receiveObj[0];
                 var rsltSize = asyncObj.socket.EndReceive(asyncResult);
 
-                Debug.Log("Receive count : " + rslt.Count + " : " + rsltSize);
-
                 if (rsltSize > 0)
                 {
                     OnPacketReceived?.Invoke(new ArraySegment<byte>(rslt.Array, 0, rsltSize));

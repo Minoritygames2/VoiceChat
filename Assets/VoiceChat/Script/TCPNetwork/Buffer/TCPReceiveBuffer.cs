@@ -38,7 +38,7 @@ public class TCPReceiveBuffer
 
         _remainSize = totalDataLength;
 
-        if (_packetSize <= _buffer.Count)
+        if (_packetSize <= _remainSize)
             return true;
         return false;
     }
