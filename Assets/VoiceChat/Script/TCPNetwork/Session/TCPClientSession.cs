@@ -58,7 +58,7 @@ namespace VoiceChat
                     ArraySegment<byte> result;
                     while (_receiveQueue.TryDequeue(out result))
                     {
-                        if(_receiveBuffer.SetBuffer(result.Array))
+                        if(_receiveBuffer.SetBuffer(result))
                         {
                             CheckPacket(_receiveBuffer.GetBuffer().Array);
                         }

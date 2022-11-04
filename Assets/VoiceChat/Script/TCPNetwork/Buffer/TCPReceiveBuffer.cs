@@ -13,24 +13,32 @@ public class TCPReceiveBuffer
     private int _packetSize = 0;
     private int _remainSize = 0;
 
-    public bool SetBuffer(byte[] receiveByte)
+    public bool SetBuffer(ArraySegment<byte> receiveSegment)
     {
-        //남은 배열이 없고 패킷사이즈도 정의 안되어있을 경우
+        //패킷사이즈 정의
         if (_packetSize == 0)
-        {
-            GetPacketSize(receiveByte);
-        }
+            if(_remainSize == 0)
+                GetPacketSize(receiveSegment.Array);
+            else
+                GetPacketSize(_buffer.Array);
 
-        var totalDataLength = _remainSize + receiveByte.Length;
+        var totalDataLength = _remainSize + receiveSegment.Count;
 
-        if (totalDataLength < _buffer.Count)
+        if (_buffer.Count < totalDataLength)
         {
             var buffer = new ArraySegment<byte>(new byte[totalDataLength], 0, totalDataLength);
-            Buffer.BlockCopy(_buffer.Array, 0, buffer.Array, 0, _buffer.Count);
+            Buffer.BlockCopy(_buffer.Array, 0, buffer.Array, 0, _remainSize);
+            Buffer.BlockCopy(receiveSegment.Array, 0, buffer.Array, _remainSize, receiveSegment.Count);
             _buffer = buffer;
         }
+        else
+        {
+            Buffer.BlockCopy(receiveSegment.Array, 0, _buffer.Array, _remainSize, receiveSegment.Count);
+        }
 
-        if (_buffer.Count <= _packetSize)
+        _remainSize = totalDataLength;
+
+        if (_packetSize <= _buffer.Count)
             return true;
         return false;
     }
@@ -47,6 +55,8 @@ public class TCPReceiveBuffer
         var remainBuffer = new ArraySegment<byte>(new byte[_buffer.Count], 0, _buffer.Count - _packetSize);
         Buffer.BlockCopy(_buffer.Array, _packetSize, remainBuffer.Array, 0, _buffer.Count - _packetSize);
         _buffer = remainBuffer;
+
+        _remainSize -= _packetSize;
 
         _packetSize = 0;
 

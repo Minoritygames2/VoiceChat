@@ -133,7 +133,7 @@ namespace VoiceChat
 
                 if (rsltSize > 0)
                 {
-                    OnPacketReceived?.Invoke(new ArraySegment<byte>(rslt.Array));
+                    OnPacketReceived?.Invoke(new ArraySegment<byte>(rslt.Array, 0, rsltSize));
                 }
             }
             catch (Exception e)
