@@ -51,13 +51,13 @@ namespace VoiceChat
         /// <summary>
         /// 패킷송신
         /// </summary>
-        public void SendPacket(int packetType, byte[] buffer)
+        public void SendPacket(int packetType, byte[] sendData)
         {
             int nowPosition = 0;
             var sendBuffer = new TCPSendBuffer(4096 * 100);
-            var rsltBuffer = MakeHeader(packetType, sendBuffer.OpenBuffer(), out nowPosition);
-            Buffer.BlockCopy(buffer, 0, rsltBuffer.Array, nowPosition, buffer.Length);
-            nowPosition += buffer.Length;
+            var rsltBuffer = MakeHeader(packetType, sendBuffer.OpenBuffer(), sendData.Length, out nowPosition);
+            Buffer.BlockCopy(sendData, 0, rsltBuffer.Array, nowPosition, sendData.Length);
+            nowPosition += sendData.Length;
             var rsltCloseBuffer = sendBuffer.CloseBuffer(nowPosition);
             Buffer.BlockCopy(rsltBuffer.Array, 0, rsltCloseBuffer.Array, 0, rsltCloseBuffer.Count);
 
@@ -71,9 +71,9 @@ namespace VoiceChat
             _socket.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), _socket);
         }
 
-        private ArraySegment<byte> MakeHeader(int packetType, ArraySegment<byte> rsltBuffer, out int nowPosition)
+        private ArraySegment<byte> MakeHeader(int packetType, ArraySegment<byte> rsltBuffer, int sendDataSize, out int nowPosition)
         {
-            nowPosition = 0;
+            nowPosition = 4;
             var playerIdByte = BitConverter.GetBytes(_voiceClientStatus.PlayerId);
             Buffer.BlockCopy(playerIdByte, 0, rsltBuffer.Array, nowPosition, playerIdByte.Length);
             nowPosition += playerIdByte.Length;
@@ -85,6 +85,10 @@ namespace VoiceChat
             var channel = BitConverter.GetBytes(_voiceClientStatus.Channel);
             Buffer.BlockCopy(channel, 0, rsltBuffer.Array, nowPosition, channel.Length);
             nowPosition += packetTypeByte.Length;
+
+            //맨처음 헤더에 패킷사이즈 보내기
+            var sendDataSizeByte = BitConverter.GetBytes(sendDataSize + nowPosition);
+            Buffer.BlockCopy(sendDataSizeByte, 0, rsltBuffer.Array, 0, 4);
             return rsltBuffer;
         }
 
@@ -108,8 +112,7 @@ namespace VoiceChat
         {
             if (!_isConnected)
                 return;
-            TCPReceiveBuffer tcpReceiveBuffer = new TCPReceiveBuffer(4096 * 100);
-            var receiveBuffer = tcpReceiveBuffer.GetWriteSegment();
+            var receiveBuffer = new ArraySegment<byte>(new byte[4096 * 100], 0, 4096 * 100);
             IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
             bufferList.Add(receiveBuffer);
             _socket.BeginReceive(bufferList, SocketFlags.None, new AsyncCallback(ReceiveCallback), new AsyncObject(bufferList, _socket));

@@ -16,6 +16,8 @@ namespace VoiceChat
         public VoiceEvent OnReceiveVoicePacket = new VoiceEvent();
 
         private TCPSession _tcpSession;
+
+        private TCPReceiveBuffer _receiveBuffer = new TCPReceiveBuffer(4096 * 100);
         public void OnConnectClient(Socket socket)
         {
             _tcpSession = new TCPSession(socket, OnSendPacket, OnReceivedPacket);
@@ -56,7 +58,11 @@ namespace VoiceChat
                     ArraySegment<byte> result;
                     while (_receiveQueue.TryDequeue(out result))
                     {
-                        CheckPacket(result.Array);
+                        if(_receiveBuffer.SetBuffer(result.Array))
+                        {
+                            CheckPacket(_receiveBuffer.GetBuffer().Array);
+                        }
+                        
                         Interlocked.Exchange(ref _isAlbleReceiveQueue, INT_ENABLE_RECEIVE);
                     }
                 }
@@ -69,7 +75,7 @@ namespace VoiceChat
                     ArraySegment<byte> result;
                     while (_sendQueue.TryDequeue(out result))
                     {
-                        _tcpSession.SendPacket(result);
+                        _tcpSession.SendPacket((int)VoicePacketType.VOICE, result.Array);
                     }
                 }
             }
@@ -78,6 +84,8 @@ namespace VoiceChat
         private void CheckPacket(byte[] packet)
         {
             int size = 0;
+            var packetSize = BitConverter.ToInt32(packet, size);
+            size += 4;
             var playerId = BitConverter.ToInt32(packet, size);
             size += 4;
             var packetType = BitConverter.ToInt32(packet, size);
