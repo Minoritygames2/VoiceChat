@@ -71,7 +71,8 @@ namespace VoiceChat
                     Buffer.BlockCopy(floatIndexData, 0, receivedFloatData, nowPosition, floatIndexData.Length);
                     nowPosition += floatIndexData.Length;
                 }
-                _audioSource.clip.SetData(receivedFloatData, timeSample);
+                _audioSource.clip.SetData(receivedFloatData, 0);
+                _audioSource.Play();
                 //_audioSource.Play();
                 /*
                 float[] spectrum = new float[256];
