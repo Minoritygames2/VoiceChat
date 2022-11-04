@@ -11,18 +11,12 @@ namespace VoiceChat
         [SerializeField]
         private ClientSettingCanvas _settingCanvas;
 
-        [SerializeField]
-        private ClientRoomCanvas _roomCtrl;
-
         [Header("Module")]
         [SerializeField]
         private MicrophoneController _micCtrl;
 
         [SerializeField]
         private UDPNetworkReceiver _udpReceiver;
-
-        [SerializeField]
-        private TCPNetworkClient _tcpClient;
 
         [Header("Room")]
         [SerializeField]
@@ -57,17 +51,7 @@ namespace VoiceChat
             Debug.Log("세팅값 : MicName : " + micName + " ipAddress : " + ipAddress);
             //SettingArea 끄기
             _settingCanvas.UnactiveSettingArea();
-            _roomCtrl.ActiveRoomArea(ipAddress);
-
-            //TCP시작되면 마이크 캡쳐 시작
-            _tcpClient.StartTcpClient(ipAddress,
-                () => {
-                    _micCtrl.StartCapture(micName, (voiceData) 
-                        => { _tcpClient.SendVoicePacket(voiceData); });
-                }
-                , 
-                (voiceData) => { _voiceClientRoom.SetVoiceData(voiceData); }
-                );
+            _voiceClientRoom.StartVoiceChat(micName, ipAddress);
         }
     }
 }

@@ -1502,9 +1502,8 @@ Transform:
   - {fileID: 2056103310}
   - {fileID: 336128411}
   - {fileID: 1288371281}
-  - {fileID: 600054314}
   m_Father: {fileID: 1262007253}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &324030773
 GameObject:
@@ -2611,13 +2610,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 600054313}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 314297666}
-  m_RootOrder: 3
+  m_Father: {fileID: 1262007253}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &600054315
 MonoBehaviour:
@@ -2634,6 +2633,9 @@ MonoBehaviour:
   _playerTransform: {fileID: 237667939}
   _playerPrefab: {fileID: 5404556261344824971, guid: 4e06064ccbd274145a180d0b685fe38b,
     type: 3}
+  _roomCanvasCtrl: {fileID: 1200356636}
+  _myTcpClient: {fileID: 1288371282}
+  _micCtrl: {fileID: 2056103311}
 --- !u!1 &695017743
 GameObject:
   m_ObjectHideFlags: 0
@@ -4049,6 +4051,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1691893174}
+  - {fileID: 600054314}
   - {fileID: 1347613978}
   - {fileID: 314297666}
   m_Father: {fileID: 1234480921}
@@ -4287,7 +4290,7 @@ Transform:
   - {fileID: 58237108}
   - {fileID: 1200356635}
   m_Father: {fileID: 1262007253}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1375260269
 GameObject:
@@ -4920,11 +4923,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac7fc756d58951f418313de0d75ffbb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _settingCtrl: {fileID: 58237109}
-  _roomCtrl: {fileID: 1200356636}
+  _settingCanvas: {fileID: 0}
   _micCtrl: {fileID: 2056103311}
   _udpReceiver: {fileID: 336128412}
-  _tcpClient: {fileID: 1288371282}
   _voiceClientRoom: {fileID: 600054315}
 --- !u!1 &1699051284
 GameObject:

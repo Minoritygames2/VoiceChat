@@ -14,12 +14,32 @@ namespace VoiceChat
         [SerializeField]
         private ClientRoomCanvas _roomCanvasCtrl;
 
+        [Header("Network")]
+        [SerializeField]
+        private TCPNetworkClient _myTcpClient;
+
+        [Header("MIC")]
+        [SerializeField]
+        private MicrophoneController _micCtrl;
+
         List<VoiceClient> _voiceClients = new List<VoiceClient>();
 
-        public void StartVoiceRoom()
+        public void StartVoiceChat(string micName, string serverIp)
         {
+            //VoiceChat Room Active상태로
+            _roomCanvasCtrl.ActiveRoomArea(serverIp);
 
+            //TCP시작되면 마이크 캡쳐 시작
+            _myTcpClient.StartTcpClient(serverIp,
+                () => {
+                    _micCtrl.StartCapture(micName, (voiceData)
+                        => { _myTcpClient.SendVoicePacket(voiceData); });
+                }
+                ,
+                (voiceData) => { SetVoiceData(voiceData); }
+                );
         }
+
         public void SetVoiceData(VoiceData voiceData)
         {
             VoiceClient client;
