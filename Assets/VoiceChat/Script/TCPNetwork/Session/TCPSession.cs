@@ -66,6 +66,9 @@ namespace VoiceChat
 
         public void SendPacket(ArraySegment<byte> buffer)
         {
+            if (!_isConnected)
+                return;
+
             IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
             bufferList.Add(buffer);
             _socket.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), _socket);
