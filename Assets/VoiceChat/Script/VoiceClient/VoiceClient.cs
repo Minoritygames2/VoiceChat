@@ -35,7 +35,7 @@ namespace VoiceChat
         public void StartVoiceClient(int networkId)
         {
             _networkId = networkId;
-            _audioSource.clip = AudioClip.Create(string.Format("{0}_Voice", _networkId), 44100, 0, 44100, false);
+            _audioSource.clip = AudioClip.Create(string.Format("{0}_Voice", _networkId), 44100, 1, 44100, false);
             _audioSource.loop = true;
             _audioSource.mute = false;
             _audioSource.Play();
