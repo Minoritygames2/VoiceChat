@@ -140,6 +140,7 @@ namespace VoiceChat
                 Debug.Log("VoiceChat :: 네트워크 :: 수신 에러 :: " + e.Message);
                 AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
                 asyncObj.socket.EndReceive(asyncResult);
+                SessionClose();
             }
             
         }
