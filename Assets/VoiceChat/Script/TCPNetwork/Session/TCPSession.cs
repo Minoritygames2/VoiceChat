@@ -69,9 +69,18 @@ namespace VoiceChat
             if (!_isConnected)
                 return;
 
-            IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
-            bufferList.Add(buffer);
-            _socket.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), _socket);
+            try
+            {
+                IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
+                bufferList.Add(buffer);
+                _socket.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), _socket);
+            }
+            catch(Exception e)
+            {
+                Debug.Log("VoiceChat :: 네트워크 ::  송신에러 :: " + e.Message);
+                SessionClose();
+            }
+            
         }
 
         private ArraySegment<byte> MakeHeader(int packetType, ArraySegment<byte> rsltBuffer, int sendDataSize, out int nowPosition)
