@@ -52,7 +52,7 @@ public class TCPReceiveBuffer
         Buffer.BlockCopy(_buffer.Array, 0, result.Array, 0, _packetSize);
 
         //남은 값 Remain에 넣기
-        var remainBuffer = new ArraySegment<byte>(new byte[_buffer.Count], 0, _buffer.Count - _packetSize);
+        var remainBuffer = new ArraySegment<byte>(new byte[_buffer.Count - _packetSize], 0, _buffer.Count - _packetSize);
         Buffer.BlockCopy(_buffer.Array, _packetSize, remainBuffer.Array, 0, _buffer.Count - _packetSize);
         _buffer = remainBuffer;
 
