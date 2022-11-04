@@ -124,7 +124,7 @@ namespace VoiceChat
             {
                 if (!_isConnected)
                     return;
-                StartClientBeginReceive();
+                
                 AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
                 var rslt = asyncObj.receiveObj[0];
                 var rsltSize = asyncObj.socket.EndReceive(asyncResult);
@@ -133,11 +133,15 @@ namespace VoiceChat
                 {
                     OnPacketReceived?.Invoke(new ArraySegment<byte>(rslt.Array, 0, rsltSize));
                 }
+                StartClientBeginReceive();
             }
             catch (Exception e)
             {
                 Debug.Log("VoiceChat :: 네트워크 :: 수신 에러 :: " + e.Message);
+                AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
+                asyncObj.socket.EndReceive(asyncResult);
             }
+            
         }
     }
 
