@@ -78,7 +78,7 @@ namespace VoiceChat
         {
             _micDropDown.ClearOptions();
             List<string> searchRslt = searchMicMethod();
-            searchRslt.Add(MicrophoneController.MicName_NONE);
+            searchRslt.Add(MicrophoneCapture.MicName_NONE);
             _micDropDown.AddOptions(searchRslt);
         }
         #endregion

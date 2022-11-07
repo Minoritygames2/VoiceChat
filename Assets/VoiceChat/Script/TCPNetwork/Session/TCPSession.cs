@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace VoiceChat
 {
@@ -17,11 +18,20 @@ namespace VoiceChat
 
         protected abstract void OnReceivedPacket(VoiceChatPacket voicePacket);
 
+        public VoicePlayer AddTcpClient(string serverIP, UnityAction OnClientConnected, UnityAction<VoiceChatPacket> OnReceiveVoicePacket)
+        {
+            var client = Instantiate(_playerPrefab, _playerTransform).GetComponent<VoicePlayer>();
+            client.NetworkClient.StartTcpClient(serverIP, OnClientConnected, OnReceiveVoicePacket);
+            return client;
+        }
+
         public VoicePlayer AddTcpClient(TcpClient tcpClient)
         {
             var client = Instantiate(_playerPrefab, _playerTransform).GetComponent<VoicePlayer>();
-            client.NetworkClient.OnReceiveVoicePacket.AddListener(OnReceivedPacket);
+            client.NetworkClient.StartTcpClient(tcpClient, OnReceivedPacket);
             return client;
         }
+
+
     }
 }

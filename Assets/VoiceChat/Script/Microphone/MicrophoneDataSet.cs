@@ -1,4 +1,4 @@
-ï»¿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +15,8 @@ namespace VoiceChat
         public int voiceIndex;
         public byte[] voiceArray;
     }
-    public class VoiceClient : MonoBehaviour
+    public class MicrophoneDataSet : MonoBehaviour
     {
-        
         [SerializeField]
         private AudioSource _audioSource;
         private int _networkId;
@@ -29,7 +28,7 @@ namespace VoiceChat
         private int _timer = 0;
         private WaitForSeconds _wait = new WaitForSeconds(0.2f);
         /// <summary>
-        /// ë‹¤ë¥¸ í´ë¼ì´ì–¸íŠ¸ë¡œ ë°›ì€ Voice ì‹œì‘
+        /// ´Ù¸¥ Å¬¶óÀÌ¾ğÆ®·Î ¹ŞÀº Voice ½ÃÀÛ
         /// </summary>
         public void StartVoiceClient(int networkId)
         {
@@ -72,28 +71,13 @@ namespace VoiceChat
                 }
                 _audioSource.clip.SetData(receivedFloatData, 0);
                 _audioSource.Play();
-                //_audioSource.Play();
-                /*
-                float[] spectrum = new float[256];
-                _audioSource.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
-                int i = 1;
-                while (i < spectrum.Length - 1)
-                {
-                    Debug.DrawLine(new Vector3(i - 1, spectrum[i] + 10, 0), new Vector3(i, spectrum[i + 1] + 10, 0), Color.red);
-                    Debug.DrawLine(new Vector3(i - 1, Mathf.Log(spectrum[i - 1]) + 10, 2), new Vector3(i, Mathf.Log(spectrum[i]) + 10, 2), Color.red);
-                    Debug.DrawLine(new Vector3(Mathf.Log(i - 1), spectrum[i - 1] - 10, 1), new Vector3(Mathf.Log(i), spectrum[i] - 10, 1), Color.red);
-                    Debug.DrawLine(new Vector3(Mathf.Log(i - 1), Mathf.Log(spectrum[i - 1]), 3), new Vector3(Mathf.Log(i), Mathf.Log(spectrum[i]), 3), Color.red);
-                    i++;
-                }
-                */
-
             }
         }
 
         /// <summary>
-        /// Voice íŒ¨í‚· 1,2,3ì´ ë‹¤ ë“¤ì–´ì™”ëŠ”ì§€ í™•ì¸
+        /// Voice ÆĞÅ¶ 1,2,3ÀÌ ´Ù µé¾î¿Ô´ÂÁö È®ÀÎ
         /// </summary>
-        /// <returns>TRUE : ë‹¤ ì¡´ì¬ FALSE : ì¡´ì¬í•˜ì§€ì•ŠìŒ</returns>
+        /// <returns>TRUE : ´Ù Á¸Àç FALSE : Á¸ÀçÇÏÁö¾ÊÀ½</returns>
         private bool CheckContainsIndex()
         {
             return (_voiceByteDatas.Any(_ => _.voiceIndex == 0) &&
@@ -110,7 +94,7 @@ namespace VoiceChat
 
         private byte[] GetVoiceData(int correctIndex)
         {
-            for(int index = 0; index < _voiceByteDatas.Count; index++)
+            for (int index = 0; index < _voiceByteDatas.Count; index++)
                 if (_voiceByteDatas[index].voiceIndex == correctIndex)
                     return _voiceByteDatas[index].voiceArray;
 
@@ -118,4 +102,3 @@ namespace VoiceChat
         }
     }
 }
-

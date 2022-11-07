@@ -70,6 +70,21 @@ namespace VoiceChat
             }
         }
 
+        /// <summary>
+        /// TCP클라이언트 접속
+        /// </summary>
+        public void StartTcpClient(TcpClient tcpClient, UnityAction<VoiceChatPacket> OnReceiveVoicePacket)
+        {
+            if (_isConnected != 0)
+            {
+                Debug.Log("VoiceChat :: 이미 서버에 접속중입니다");
+                return;
+            }
+            this.OnReceiveVoicePacket.AddListener(OnReceiveVoicePacket);
+            _isConnected = 1;
+            _tcpClient = tcpClient;
+        }
+
         private void ConnectCallback(IAsyncResult asyncResult)
         {
             _isConnected = 2;
@@ -81,7 +96,7 @@ namespace VoiceChat
         /// <summary>
         /// 패킷송신
         /// </summary>
-        public void SendPacket(ArraySegment<byte> buffer)
+        private void SendPacket(ArraySegment<byte> buffer)
         {
             if (_isConnected != 2)
                 return;
@@ -160,6 +175,22 @@ namespace VoiceChat
 
 
         #region 패킷관리
+
+
+        private void ParseVoicePacket(int playerId, byte[] message)
+        {
+            int size = 0;
+            var voiceId = BitConverter.ToInt32(message, size);
+            size += 4;
+
+            var voiceIndex = BitConverter.ToInt32(message, size);
+            size += 4;
+
+            var voicePacket = new byte[message.Length - size];
+            Buffer.BlockCopy(message, size, voicePacket, 0, message.Length - size);
+            VoiceData voiceData = new VoiceData() { networkId = playerId, voiceID = voiceId, voiceIndex = voiceIndex, voiceArray = voicePacket };
+        }
+
         /// <summary>
         /// 패킷송신
         /// </summary>
@@ -167,16 +198,34 @@ namespace VoiceChat
         {
             int nowPosition = 0;
             var sendBuffer = new TCPSendBuffer(4096 * 100);
-            var rsltBuffer = MakeHeader(voiceChatPacket.playerId, voiceChatPacket.channel,(int)voiceChatPacket.packetType, sendBuffer.OpenBuffer(), voiceChatPacket.message.Length, out nowPosition);
-            Buffer.BlockCopy(voiceChatPacket.message, 0, rsltBuffer.Array, nowPosition, voiceChatPacket.message
+            var rsltBuffer = MakeHeader(voiceChatPacket.playerId, voiceChatPacket.channel, (int)voiceChatPacket.packetType, sendBuffer.OpenBuffer(), voiceChatPacket.message.Length, out nowPosition);
+
+            if (voiceChatPacket.packetType == VoicePacketType.VOICE)
+            {
+                var voiceData = voiceChatPacket.voiceData;
+                var voiceIdByte = BitConverter.GetBytes(voiceData.voiceID);
+                Buffer.BlockCopy(voiceIdByte, 0, rsltBuffer.Array, nowPosition, voiceIdByte.Length);
+                nowPosition += voiceIdByte.Length;
+
+                var voiceIndex = BitConverter.GetBytes(voiceData.voiceIndex);
+                Buffer.BlockCopy(voiceIndex, 0, rsltBuffer.Array, nowPosition, voiceIndex.Length);
+                nowPosition += voiceIndex.Length;
+
+                Buffer.BlockCopy(voiceData.voiceArray, 0, rsltBuffer.Array, nowPosition, voiceData.voiceArray.Length);
+                nowPosition += voiceData.voiceArray.Length;
+            }
+            else
+            {
+                Buffer.BlockCopy(voiceChatPacket.message, 0, rsltBuffer.Array, nowPosition, voiceChatPacket.message
                 .Length);
-            nowPosition += voiceChatPacket.message.Length;
+                nowPosition += voiceChatPacket.message.Length;
+            }
             var rsltCloseBuffer = sendBuffer.CloseBuffer(nowPosition);
             Buffer.BlockCopy(rsltBuffer.Array, 0, rsltCloseBuffer.Array, 0, rsltCloseBuffer.Count);
             SendPacket(rsltCloseBuffer);
         }
 
-        private ArraySegment<byte> MakeHeader(int playerId, int playerChannel, int packetType, ArraySegment<byte> rsltBuffer, int sendDataSize, out int nowPosition)
+        protected ArraySegment<byte> MakeHeader(int playerId, int playerChannel, int packetType, ArraySegment<byte> rsltBuffer, int sendDataSize, out int nowPosition)
         {
             nowPosition = 4;
             var playerIdByte = BitConverter.GetBytes(playerId);
@@ -257,10 +306,18 @@ namespace VoiceChat
             this.channel = channel;
             this.message = message;
         }
+        public VoiceChatPacket(int playerId, VoicePacketType packetType, int channel, VoiceData voiceData)
+        {
+            this.playerId = playerId;
+            this.packetType = packetType;
+            this.channel = channel;
+            this.voiceData = voiceData;
+        }
         public int playerId;
         public VoicePacketType packetType;
         public int channel;
         public byte[] message;
+        public VoiceData voiceData;
     }
 
 }
