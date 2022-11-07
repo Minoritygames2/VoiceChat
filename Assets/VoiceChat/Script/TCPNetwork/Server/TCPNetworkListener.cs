@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Events;
 namespace VoiceChat
@@ -13,6 +14,12 @@ namespace VoiceChat
         private TcpListener _listener;
         [SerializeField]
         private TCPServerSession _tcpServerSession;
+
+        private ConcurrentQueue<TcpClient> _acceptQueue = new ConcurrentQueue<TcpClient>();
+        private int _isAlbleAcceptQueue = 0;
+        private int INT_ENABLE_ACCEPT = 0;
+        private int INT_UNABLE_ACCEPT = 1;
+
         public void StartTCPListener(int port, UnityAction ServerStartedEvent)
         {
             Debug.Log("VoiceChat :: 네트워크 :: TCP 서버를 실행합니다");
@@ -39,7 +46,13 @@ namespace VoiceChat
                 var listener = (TcpListener)asyncResult.AsyncState;
                 var client = listener.EndAcceptTcpClient(asyncResult);
 
-                _tcpServerSession.AddPlayer(client);
+                if (Interlocked.CompareExchange(ref _isAlbleAcceptQueue, INT_UNABLE_ACCEPT, INT_ENABLE_ACCEPT) == INT_UNABLE_ACCEPT)
+                {
+                    _acceptQueue.Enqueue(client);
+                    Interlocked.Exchange(ref _isAlbleAcceptQueue, INT_ENABLE_ACCEPT);
+                }
+
+                
             }
             catch (Exception e)
             {
@@ -51,9 +64,27 @@ namespace VoiceChat
             }
         }
 
-        
+        private void Update()
+        {
+            if (_acceptQueue.Count > 0)
+            {
+                if (Interlocked.CompareExchange(ref _isAlbleAcceptQueue, INT_UNABLE_ACCEPT, INT_ENABLE_ACCEPT) == INT_UNABLE_ACCEPT)
+                {
+                    TcpClient result;
+                    while (_acceptQueue.Count > 0)
+                    {
+                        while (_acceptQueue.TryDequeue(out result))
+                        {
+                            _tcpServerSession.AddPlayer(result);
+                        }
+                    }
+                    Interlocked.Exchange(ref _isAlbleAcceptQueue, INT_ENABLE_ACCEPT);
+                }
+            }
+        }
 
-        
+
+
     }
 
 }

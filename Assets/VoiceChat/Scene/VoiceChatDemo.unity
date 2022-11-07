@@ -2718,7 +2718,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &763517589
 Transform:
   m_ObjectHideFlags: 0
@@ -3798,7 +3798,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1234480921
 Transform:
   m_ObjectHideFlags: 0
@@ -4802,7 +4802,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac7fc756d58951f418313de0d75ffbb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _settingCanvas: {fileID: 0}
+  _settingCanvas: {fileID: 58237109}
   _micCtrl: {fileID: 2056103311}
   _udpReceiver: {fileID: 336128412}
   _voiceClientRoom: {fileID: 600054315}
