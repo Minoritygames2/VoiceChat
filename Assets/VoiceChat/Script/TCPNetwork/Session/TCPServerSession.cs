@@ -19,7 +19,7 @@ namespace VoiceChat
 
         public void AddPlayer(TcpClient tcpClient)
         {
-
+            AddTcpClient(tcpClient);
         }
     }
 }

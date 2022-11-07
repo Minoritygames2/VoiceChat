@@ -11,6 +11,7 @@ namespace VoiceChat
 {
     public class TCPClientSession : TCPSession
     {
+        private VoicePlayer _myVoicePlayer;
         protected override void OnReceivedPacket(VoiceChatPacket voicePacket)
         {
             if (voicePacket.playerId == 0)
@@ -28,8 +29,7 @@ namespace VoiceChat
             {
                 case VoicePacketType.ACCEPT:
                     var playerId = BitConverter.ToInt32(message, 0);
-                    Debug.Log("voiceChat :: 플레이어 등록 " + playerId);
-                    _tcpClient[0].PlayerId = playerId;
+                    _myVoicePlayer.InitVoicePlayer(playerId);
                     break;
                 default:
                     break;
@@ -38,7 +38,7 @@ namespace VoiceChat
 
         private void ClientPacket(int playerId, int packetType, byte[] message)
         {
-            if (_tcpClient[0].PlayerId == playerId)
+            if (_myVoicePlayer.GetPlayerId() == playerId)
                 return;
 
             switch ((VoicePacketType)packetType)

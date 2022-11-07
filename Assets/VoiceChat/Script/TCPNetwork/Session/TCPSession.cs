@@ -8,16 +8,20 @@ namespace VoiceChat
 {
     public abstract class TCPSession : MonoBehaviour
     {
-        protected List<TCPNetworkClient> _tcpClient = new List<TCPNetworkClient>();
+        [SerializeField]
+        private GameObject _playerPrefab;
+        [SerializeField]
+        private Transform _playerTransform;
         private VoiceClientStatus _voiceClientStatus = new VoiceClientStatus();
         public VoiceClientStatus VoiceClientStatus { get => _voiceClientStatus; set => _voiceClientStatus = value; }
 
         protected abstract void OnReceivedPacket(VoiceChatPacket voicePacket);
 
-        public void AddTcpClient(TCPNetworkClient tcpClient)
+        public VoicePlayer AddTcpClient(TcpClient tcpClient)
         {
-            tcpClient.OnReceiveVoicePacket.AddListener(OnReceivedPacket);
-            _tcpClient.Add(tcpClient);
+            var client = Instantiate(_playerPrefab, _playerTransform).GetComponent<VoicePlayer>();
+            client.NetworkClient.OnReceiveVoicePacket.AddListener(OnReceivedPacket);
+            return client;
         }
     }
 }
