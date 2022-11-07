@@ -12,6 +12,8 @@ namespace VoiceChat
     {
         public delegate void TCPSessionEvent(TCPSession tcpSession);
 
+        private List<VoicePlayer> _voicePlayer = new List<VoicePlayer>();
+        private int _index = 0;
         protected override void OnReceivedPacket(VoiceChatPacket voicePacket)
         {
 
@@ -19,7 +21,11 @@ namespace VoiceChat
 
         public void AddPlayer(TcpClient tcpClient)
         {
-            AddTcpClient(tcpClient);
+            _index++;
+            var newClient = AddTcpClient(tcpClient);
+            _voicePlayer.Add(newClient);
+            newClient.InitVoicePlayer(_index);
+            newClient.NetworkClient.SendPacket(new VoiceChatPacket(0, VoicePacketType.ACCEPT, 0, new byte[0]));
         }
     }
 }
