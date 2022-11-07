@@ -16,13 +16,13 @@ namespace VoiceChat
 
         [Header("Network")]
         [SerializeField]
-        private TCPNetworkClient _myTcpClient;
+        private TCPClientSession _clientSession;
 
         [Header("MIC")]
         [SerializeField]
         private MicrophoneController _micCtrl;
 
-        List<VoiceClient> _voiceClients = new List<VoiceClient>();
+        private List<VoiceClient> _voiceClients = new List<VoiceClient>();
 
         public void StartVoiceChat(string micName, string serverIp)
         {
@@ -30,14 +30,14 @@ namespace VoiceChat
             _roomCanvasCtrl.ActiveRoomArea(serverIp);
 
             //TCP시작되면 마이크 캡쳐 시작
-            _myTcpClient.StartTcpClient(serverIp,
-                () => {
-                    _micCtrl.StartCapture(micName, (voiceData)
-                        => { _myTcpClient.SendVoicePacket(voiceData); });
-                }
-                ,
-                (voiceData) => { SetVoiceData(voiceData); }
-                );
+            //_clientSession.StartTcpClient(serverIp,
+            //    () => {
+            //        _micCtrl.StartCapture(micName, (voiceData)
+            //            => { _myTcpClient.SendVoicePacket(voiceData); });
+            //    }
+            //    ,
+            //    (voiceData) => { SetVoiceData(voiceData); }
+            //    );
         }
 
         public void SetVoiceData(VoiceData voiceData)
@@ -48,7 +48,7 @@ namespace VoiceChat
             else
                 client = GetClient(voiceData.networkId);
 
-            client.SetVoiceData(voiceData.voiceArray, voiceData.voiceID, voiceData.voiceIndex, voiceData.timeSamples);
+            client.SetVoiceData(voiceData.voiceArray, voiceData.voiceID, voiceData.voiceIndex);
         }
 
         public VoiceClient AddVoiceClient(int networkId)

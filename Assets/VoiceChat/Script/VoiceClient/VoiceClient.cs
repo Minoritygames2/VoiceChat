@@ -13,7 +13,6 @@ namespace VoiceChat
         public int networkId;
         public int voiceID;
         public int voiceIndex;
-        public int timeSamples;
         public byte[] voiceArray;
     }
     public class VoiceClient : MonoBehaviour
@@ -41,7 +40,7 @@ namespace VoiceChat
             _audioSource.Play();
         }
 
-        public void SetVoiceData(byte[] voiceArray, int voiceID, int voiceIndex, int timeSample)
+        public void SetVoiceData(byte[] voiceArray, int voiceID, int voiceIndex)
         {
             if (voiceArray.Length <= 0)
                 return;

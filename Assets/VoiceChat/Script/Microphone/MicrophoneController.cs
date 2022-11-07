@@ -123,7 +123,7 @@ namespace VoiceChat
                         Array.Copy(data, 0, byteValue, byteValueIndex, 4);
                         byteValueIndex += 4;
                     }
-                    SendPacket?.Invoke(new VoiceData() { voiceID = _voiceID, voiceIndex = index, timeSamples = _micAudioSource.timeSamples, voiceArray = byteValue });
+                    SendPacket?.Invoke(new VoiceData() { voiceID = _voiceID, voiceIndex = index, voiceArray = byteValue });
                 }
                 yield return _wait;
             }

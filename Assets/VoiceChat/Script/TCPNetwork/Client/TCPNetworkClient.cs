@@ -1,4 +1,4 @@
-Ôªøusing System;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,25 +12,51 @@ namespace VoiceChat
 {
     public class TCPNetworkClient : MonoBehaviour
     {
-        private TcpClient _tcpClient = new TcpClient();
-        [SerializeField]
-        private TCPClientSession _clientSession;
-        
+        public class AsyncObject
+        {
+            public AsyncObject(IList<ArraySegment<byte>> receiveObj, Socket socket)
+            {
+                this.receiveObj = receiveObj;
+                this.socket = socket;
+            }
+            public IList<ArraySegment<byte>> receiveObj;
+            public Socket socket;
+        }
+        #region «√∑π¿ÃæÓ ºº∆√
+        private int _playerId = 0;
+        public int PlayerId { get=> _playerId; set=> _playerId = value; }
+        private int _channel = 0;
+        public int Channel { get => _channel; set => _channel = value; }
+        #endregion
+
+        public class VoiceChatPacketEvnet : UnityEvent<VoiceChatPacket> { }
+        private TcpClient _tcpClient;
+        public UnityEvent OnClientConnected = new UnityEvent();
+        public UnityEvent OnClientDisconnected = new UnityEvent();
+        public VoiceChatPacketEvnet OnReceiveVoicePacket = new VoiceChatPacketEvnet();
+
+        //0 : ¡¢º”«œ¡ˆæ ¿Ω 1 : ¡¢º”¡ﬂ 2 : ¡¢º”øœ∑·
         private int _isConnected = 0;
-        #region Ï†ëÏÜç/ÏÜ°ÏàòÏã† Î™®Îìà
+
+        private ConcurrentQueue<ArraySegment<byte>> _receiveQueue = new ConcurrentQueue<ArraySegment<byte>>();
+        private int _isAlbleReceiveQueue = 0;
+        private int INT_ENABLE_RECEIVE = 0;
+        private int INT_UNABLE_RECEIVE = 1;
+        private TCPReceiveBuffer _receiveBuffer = new TCPReceiveBuffer(4096 * 100);
+        #region ¡¢º”
         /// <summary>
-        /// TCPÌÅ¥ÎùºÏù¥Ïñ∏Ìä∏ Ï†ëÏÜç
+        /// TCP≈¨∂Û¿Ãæ∆Æ ¡¢º”
         /// </summary>
-        public void StartTcpClient(string ipStr, UnityAction OnClientConnected, UnityAction<VoiceData> OnReceiveVoicePacket)
+        public void StartTcpClient(string ipStr, UnityAction OnClientConnected, UnityAction<VoiceChatPacket> OnReceiveVoicePacket)
         {
             if (_isConnected != 0)
             {
-                Debug.Log("VoiceChat :: Ïù¥ÎØ∏ ÏÑúÎ≤ÑÏóê Ï†ëÏÜçÏ§ëÏûÖÎãàÎã§");
+                Debug.Log("VoiceChat :: ¿ÃπÃ º≠πˆø° ¡¢º”¡ﬂ¿‘¥œ¥Ÿ");
                 return;
             }
 
-            _clientSession.OnClientConnected.AddListener(OnClientConnected);
-            _clientSession.OnReceiveVoicePacket.AddListener(OnReceiveVoicePacket);
+            this.OnClientConnected.AddListener(OnClientConnected);
+            this.OnReceiveVoicePacket.AddListener(OnReceiveVoicePacket);
 
             try
             {
@@ -40,39 +66,201 @@ namespace VoiceChat
             }
             catch (Exception e)
             {
-                Debug.Log("VoiceChat :: ÎÑ§Ìä∏ÏõåÌÅ¨ :: ÌÅ¥ÎùºÏù¥Ïñ∏Ìä∏ Ï†ëÏÜç Ïã§Ìå® : " + e.Message);
+                Debug.Log("VoiceChat :: ≥◊∆Æøˆ≈© :: ≈¨∂Û¿Ãæ∆Æ ¡¢º” Ω«∆– : " + e.Message);
             }
         }
 
         private void ConnectCallback(IAsyncResult asyncResult)
         {
             _isConnected = 2;
-            _clientSession.OnConnectClient((Socket)asyncResult.AsyncState);
+            OnClientConnected.Invoke();
+        }
+        #endregion
+
+        #region º€Ω≈
+        /// <summary>
+        /// ∆–≈∂º€Ω≈
+        /// </summary>
+        public void SendPacket(ArraySegment<byte> buffer)
+        {
+            if (_isConnected != 2)
+                return;
+
+            try
+            {
+                IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
+                bufferList.Add(buffer);
+                _tcpClient.Client.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), _tcpClient.Client);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("VoiceChat :: ≥◊∆Æøˆ≈© ::  º€Ω≈ø°∑Ø :: " + e.Message);
+                SessionClose();
+            }
         }
 
+        private void SendCallback(IAsyncResult asyncResult)
+        {
+            try
+            {
+                Socket socket = (Socket)asyncResult.AsyncState;
+                var rsltSize = socket.EndSend(asyncResult);
+                OnSendPacket();
+            }
+            catch (Exception e)
+            {
+                Debug.Log("VoiceChat :: ≥◊∆Æøˆ≈© :: º€Ω≈ ø°∑Ø :: " + e.Message);
+            }
+        }
+
+        private void OnSendPacket()
+        {
+            Interlocked.Exchange(ref _isAlbleReceiveQueue, INT_ENABLE_RECEIVE);
+        }
+        #endregion
+
+        #region ºˆΩ≈
         /// <summary>
-        /// ÌÅ¥ÎùºÏù¥Ïñ∏Ìä∏ Ï†ëÏÜçÎÅäÍ∏∞
+        /// ∏ﬁºº¡ˆ ºˆΩ≈ Ω√¿€
         /// </summary>
-        public void DisconnectClient()
+        public void StartClientBeginReceive()
+        {
+            if (_isConnected != 2)
+                return;
+            var receiveBuffer = new ArraySegment<byte>(new byte[4096 * 100], 0, 4096 * 100);
+            IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
+            bufferList.Add(receiveBuffer);
+            _tcpClient.Client.BeginReceive(bufferList, SocketFlags.None, new AsyncCallback(ReceiveCallback), new AsyncObject(bufferList, _tcpClient.Client));
+        }
+
+        private void ReceiveCallback(IAsyncResult asyncResult)
+        {
+            try
+            {
+                if (_isConnected != 2)
+                    return;
+
+                AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
+                var rslt = asyncObj.receiveObj[0];
+                var rsltSize = asyncObj.socket.EndReceive(asyncResult);
+
+                if (rsltSize > 0)
+                    _receiveQueue.Enqueue(new ArraySegment<byte>(rslt.Array, 0, rsltSize));
+                StartClientBeginReceive();
+            }
+            catch (Exception e)
+            {
+                Debug.Log("VoiceChat :: ≥◊∆Æøˆ≈© :: ºˆΩ≈ ø°∑Ø :: " + e.Message);
+                AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
+                asyncObj.socket.EndReceive(asyncResult);
+                SessionClose();
+            }
+        }
+        #endregion
+
+
+        #region ∆–≈∂∞¸∏Æ
+        /// <summary>
+        /// ∆–≈∂º€Ω≈
+        /// </summary>
+        public void SendPacket(VoiceChatPacket voiceChatPacket)
+        {
+            int nowPosition = 0;
+            var sendBuffer = new TCPSendBuffer(4096 * 100);
+            var rsltBuffer = MakeHeader(voiceChatPacket.playerId, voiceChatPacket.channel,(int)voiceChatPacket.packetType, sendBuffer.OpenBuffer(), voiceChatPacket.message.Length, out nowPosition);
+            Buffer.BlockCopy(voiceChatPacket.message, 0, rsltBuffer.Array, nowPosition, voiceChatPacket.message
+                .Length);
+            nowPosition += voiceChatPacket.message.Length;
+            var rsltCloseBuffer = sendBuffer.CloseBuffer(nowPosition);
+            Buffer.BlockCopy(rsltBuffer.Array, 0, rsltCloseBuffer.Array, 0, rsltCloseBuffer.Count);
+            SendPacket(rsltCloseBuffer);
+        }
+
+        private ArraySegment<byte> MakeHeader(int playerId, int playerChannel, int packetType, ArraySegment<byte> rsltBuffer, int sendDataSize, out int nowPosition)
+        {
+            nowPosition = 4;
+            var playerIdByte = BitConverter.GetBytes(playerId);
+            Buffer.BlockCopy(playerIdByte, 0, rsltBuffer.Array, nowPosition, playerIdByte.Length);
+            nowPosition += playerIdByte.Length;
+
+            var packetTypeByte = BitConverter.GetBytes(packetType);
+            Buffer.BlockCopy(packetTypeByte, 0, rsltBuffer.Array, nowPosition, packetTypeByte.Length);
+            nowPosition += packetTypeByte.Length;
+
+            var channel = BitConverter.GetBytes(playerChannel);
+            Buffer.BlockCopy(channel, 0, rsltBuffer.Array, nowPosition, channel.Length);
+            nowPosition += packetTypeByte.Length;
+
+            //∏«√≥¿Ω «Ï¥ıø° ∆–≈∂ªÁ¿Ã¡Ó ∫∏≥ª±‚
+            var sendDataSizeByte = BitConverter.GetBytes(sendDataSize + nowPosition);
+            Buffer.BlockCopy(sendDataSizeByte, 0, rsltBuffer.Array, 0, 4);
+            return rsltBuffer;
+        }
+
+        #endregion
+
+        private void Update()
+        {
+            if (_receiveQueue.Count > 0)
+            {
+                if (Interlocked.CompareExchange(ref _isAlbleReceiveQueue, INT_UNABLE_RECEIVE, INT_ENABLE_RECEIVE) == INT_UNABLE_RECEIVE)
+                {
+                    ArraySegment<byte> result;
+                    while (_receiveQueue.Count > 0)
+                    {
+                        while (_receiveQueue.TryDequeue(out result))
+                        {
+                            if (_receiveBuffer.SetBuffer(result))
+                            {
+                                CheckPacket(_receiveBuffer.GetBuffer().Array);
+                            }
+                        }
+                    }
+                    Interlocked.Exchange(ref _isAlbleReceiveQueue, INT_ENABLE_RECEIVE);
+                }
+            }
+        }
+
+        private void CheckPacket(byte[] packet)
+        {
+            int size = 0;
+            var packetSize = BitConverter.ToInt32(packet, size);
+            size += 4;
+            var playerId = BitConverter.ToInt32(packet, size);
+            size += 4;
+            var packetType = BitConverter.ToInt32(packet, size);
+            size += 4;
+            var channel = BitConverter.ToInt32(packet, size);
+            size += 4;
+            var message = new byte[packet.Length - size];
+            Buffer.BlockCopy(packet, size, message, 0, packet.Length - size);
+        }
+
+        public void SessionClose()
         {
             _isConnected = 0;
+            _tcpClient.Client.Close();
+            OnClientConnected.RemoveAllListeners();
+            OnClientDisconnected.RemoveAllListeners();
+            OnReceiveVoicePacket.RemoveAllListeners();
         }
 
-        #endregion
+    }
 
-        #region ÌÜµÏã† Ïù¥Î≤§Ìä∏ Ï≤òÎ¶¨
 
-        public void SendVoicePacket(VoiceData voiceData)
+    public class VoiceChatPacket
+    {
+        public VoiceChatPacket(int playerId, VoicePacketType packetType, int channel, byte[] message)
         {
-            if (_isConnected != 0)
-                _clientSession.SendPacket(voiceData);
+            this.playerId = playerId;
+            this.packetType = packetType;
+            this.channel = channel;
+            this.message = message;
         }
-        #endregion
-
-        private void OnDestroy()
-        {
-            DisconnectClient();
-        }
+        public int playerId;
+        public VoicePacketType packetType;
+        public int channel;
+        public byte[] message;
     }
 
 }
