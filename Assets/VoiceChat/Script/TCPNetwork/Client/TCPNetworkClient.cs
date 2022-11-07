@@ -329,6 +329,7 @@ namespace VoiceChat
             this.playerId = playerId;
             this.packetType = packetType;
             this.channel = channel;
+            this.message = new byte[0];
             this.voiceData = voiceData;
         }
         public int playerId;

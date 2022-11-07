@@ -65,7 +65,6 @@ namespace VoiceChat
                 var voiceValues = new float[24000];
 
                 _micAudioSource.clip.GetData(voiceValues, _micAudioSource.timeSamples);
-                Debug.Log(_micAudioSource.timeSamples);
 
                 for (int index = 0; index < 3; index++)
                 {
