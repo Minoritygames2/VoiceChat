@@ -89,7 +89,6 @@ namespace VoiceChat
         private void ConnectCallback(IAsyncResult asyncResult)
         {
             _chConnected = 2;
-            OnClientConnected.Invoke();
         }
         #endregion
 
@@ -131,7 +130,7 @@ namespace VoiceChat
 
         private void OnSendPacket()
         {
-            Interlocked.Exchange(ref _isAlbleReceiveQueue, INT_ENABLE_RECEIVE);
+            Debug.Log("송신완료");
         }
         #endregion
 
