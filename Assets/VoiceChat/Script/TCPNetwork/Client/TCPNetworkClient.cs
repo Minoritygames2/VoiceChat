@@ -264,7 +264,7 @@ namespace VoiceChat
                 {
                     OnClientConnected?.Invoke();
                 }
-                _chConnected = _isConnected;
+                _isConnected = _chConnected;
             }
 
             if (_receiveQueue.Count > 0)
