@@ -37,6 +37,7 @@ namespace VoiceChat
 
         //0 : 접속하지않음 1 : 접속중 2 : 접속완료
         private int _isConnected = 0;
+        private int _chConnected = 0;
 
         private ConcurrentQueue<ArraySegment<byte>> _receiveQueue = new ConcurrentQueue<ArraySegment<byte>>();
         private int _isAlbleReceiveQueue = 0;
@@ -60,7 +61,7 @@ namespace VoiceChat
 
             try
             {
-                _isConnected = 1;
+                _chConnected = 1;
                 _tcpClient = new TcpClient();
                 _tcpClient.BeginConnect(IPAddress.Parse(ipStr), 5555, new AsyncCallback(ConnectCallback), _tcpClient.Client);
             }
@@ -81,13 +82,13 @@ namespace VoiceChat
                 return;
             }
             this.OnReceiveVoicePacket.AddListener(OnReceiveVoicePacket);
-            _isConnected = 1;
+            _chConnected = 1;
             _tcpClient = tcpClient;
         }
 
         private void ConnectCallback(IAsyncResult asyncResult)
         {
-            _isConnected = 2;
+            _chConnected = 2;
             OnClientConnected.Invoke();
         }
         #endregion
@@ -250,6 +251,23 @@ namespace VoiceChat
 
         private void Update()
         {
+            if(_chConnected != _isConnected)
+            {
+                if(_chConnected == 0)
+                {
+                    OnClientDisconnected?.Invoke();
+                }
+                else if (_chConnected == 1)
+                {
+
+                }
+                else if (_chConnected == 2)
+                {
+                    OnClientConnected?.Invoke();
+                }
+                _chConnected = _isConnected;
+            }
+
             if (_receiveQueue.Count > 0)
             {
                 if (Interlocked.CompareExchange(ref _isAlbleReceiveQueue, INT_UNABLE_RECEIVE, INT_ENABLE_RECEIVE) == INT_UNABLE_RECEIVE)
@@ -287,7 +305,7 @@ namespace VoiceChat
 
         public void SessionClose()
         {
-            _isConnected = 0;
+            _chConnected = 0;
             _tcpClient.Client.Close();
             OnClientConnected.RemoveAllListeners();
             OnClientDisconnected.RemoveAllListeners();
