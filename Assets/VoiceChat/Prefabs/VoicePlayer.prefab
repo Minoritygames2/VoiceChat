@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1633470784709171788}
-  - component: {fileID: 7823685443366715582}
+  - component: {fileID: 4628556922809879236}
   m_Layer: 0
   m_Name: MicrophoneCapture
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 7353974686847624292}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7823685443366715582
+--- !u!114 &4628556922809879236
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5171068710180890809}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a223043730d0b247b11f78d16037c73, type: 3}
+  m_Script: {fileID: 11500000, guid: 58cd6e645280d0943b7916b2ceebf2f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _micAudioSource: {fileID: 7353974686687230967}
@@ -272,6 +272,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _networkClient: {fileID: 7353974686677251195}
+  _micCapture: {fileID: 4628556922809879236}
+  _micDataSet: {fileID: 130907193587243851}
 --- !u!1 &7999585015759843681
 GameObject:
   m_ObjectHideFlags: 0
@@ -281,10 +283,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 450692194519254782}
-  - component: {fileID: 8356368471777117183}
-  - component: {fileID: 1374431810575438185}
+  - component: {fileID: 130907193587243851}
   m_Layer: 0
-  m_Name: VoiceClient
+  m_Name: MicrophoneDataSet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -305,7 +306,7 @@ Transform:
   m_Father: {fileID: 7353974686847624292}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8356368471777117183
+--- !u!114 &130907193587243851
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -314,20 +315,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7999585015759843681}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a877fa0a750d4043a8a8118722c49ec, type: 3}
+  m_Script: {fileID: 11500000, guid: 8275fc212715fdc48a4a9e970cea1d6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _audioSource: {fileID: 7353974686687230967}
---- !u!114 &1374431810575438185
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7999585015759843681}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a223043730d0b247b11f78d16037c73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _micAudioSource: {fileID: 7353974686687230967}

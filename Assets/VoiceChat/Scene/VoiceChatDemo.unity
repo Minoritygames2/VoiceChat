@@ -2502,9 +2502,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8e72f44844a3a74194fb6b1263d0537, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerTransform: {fileID: 237667939}
-  _playerPrefab: {fileID: 5404556261344824971, guid: 4e06064ccbd274145a180d0b685fe38b,
-    type: 3}
   _roomCanvasCtrl: {fileID: 1200356636}
   _clientSession: {fileID: 2109391917}
   _micCtrl: {fileID: 2056103311}
@@ -2721,7 +2718,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &763517589
 Transform:
   m_ObjectHideFlags: 0
@@ -6140,7 +6137,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a223043730d0b247b11f78d16037c73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _micAudioSource: {fileID: 0}
 --- !u!1 &2109391915
 GameObject:
   m_ObjectHideFlags: 0
