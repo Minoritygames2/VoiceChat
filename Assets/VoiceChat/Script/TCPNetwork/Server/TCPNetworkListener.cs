@@ -45,14 +45,10 @@ namespace VoiceChat
             {
                 var listener = (TcpListener)asyncResult.AsyncState;
                 var client = listener.EndAcceptTcpClient(asyncResult);
-
-                if (Interlocked.CompareExchange(ref _isAlbleAcceptQueue, INT_UNABLE_ACCEPT, INT_ENABLE_ACCEPT) == INT_UNABLE_ACCEPT)
-                {
-                    _acceptQueue.Enqueue(client);
-                    Interlocked.Exchange(ref _isAlbleAcceptQueue, INT_ENABLE_ACCEPT);
-                }
-
-                
+                while (Interlocked.CompareExchange(ref _isAlbleAcceptQueue, INT_UNABLE_ACCEPT, INT_ENABLE_ACCEPT) == INT_UNABLE_ACCEPT)
+                { }
+                _acceptQueue.Enqueue(client);
+                Interlocked.Exchange(ref _isAlbleAcceptQueue, INT_ENABLE_ACCEPT);
             }
             catch (Exception e)
             {

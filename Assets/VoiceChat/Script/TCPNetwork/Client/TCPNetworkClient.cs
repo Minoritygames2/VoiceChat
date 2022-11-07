@@ -82,7 +82,8 @@ namespace VoiceChat
                 return;
             }
             this.OnReceiveVoicePacket.AddListener(OnReceiveVoicePacket);
-            _chConnected = 1;
+            _chConnected = 2;
+            _isConnected = 2;
             _tcpClient = tcpClient;
         }
 

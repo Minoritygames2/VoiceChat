@@ -47,7 +47,6 @@ namespace VoiceChat
         {
             try
             {
-                //Debug.Log("VoiceChat :: 네트워크 :: 송신 ::" + _endPoint.Address.ToString() + _endPoint.Port.ToString());
                 _udpClient.BeginSend(packet, packet.Length, new AsyncCallback(SendCallback), _udpClient);
             }
             catch(Exception e)
@@ -60,7 +59,6 @@ namespace VoiceChat
         {
             UdpClient udpClient = (UdpClient)asyncResult.AsyncState;
             udpClient.EndSend(asyncResult);
-            //Debug.Log("VoiceChat :: 네트워크 :: 송신이 완료되었습니다 ");
         }
     }
 
