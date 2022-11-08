@@ -227,6 +227,7 @@ namespace VoiceChat
 
             var rsltCloseBuffer = sendBuffer.CloseBuffer(nowPosition);
             Buffer.BlockCopy(rsltBuffer.Array, 0, rsltCloseBuffer.Array, 0, rsltCloseBuffer.Count);
+            Debug.Log("보내는 패킷 : " + rsltCloseBuffer.Array.Length);
             SendPacket(rsltCloseBuffer);
         }
 
@@ -285,6 +286,7 @@ namespace VoiceChat
                         {
                             if (_receiveBuffer.SetBuffer(result))
                             {
+                                
                                 CheckPacket(_receiveBuffer.GetBuffer().Array);
                             }
                         }
@@ -296,6 +298,7 @@ namespace VoiceChat
 
         private void CheckPacket(byte[] packet)
         {
+            Debug.Log("받는 패킷 : " + packet.Length);
             int size = 0;
             var packetSize = BitConverter.ToInt32(packet, size);
             size += 4;
