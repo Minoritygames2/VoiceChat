@@ -767,6 +767,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 182731356}
   m_CullTransparentMesh: 0
+--- !u!1 &183253579
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 183253580}
+  m_Layer: 0
+  m_Name: Players
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &183253580
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183253579}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 763517589}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &198349920
 GameObject:
   m_ObjectHideFlags: 0
@@ -2733,6 +2764,7 @@ Transform:
   m_Children:
   - {fileID: 874984445}
   - {fileID: 695017744}
+  - {fileID: 183253580}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4021,7 +4053,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1288371281}
-  - component: {fileID: 1288371282}
   m_Layer: 0
   m_Name: TCPClient
   m_TagString: Untagged
@@ -4045,20 +4076,6 @@ Transform:
   m_Father: {fileID: 314297666}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1288371282
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1288371280}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56ed19dae5daec446bda08587586a93e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _clientSession: {fileID: 2109391917}
-  _isConnected: 0
 --- !u!1 &1334917049
 GameObject:
   m_ObjectHideFlags: 0
@@ -4337,7 +4354,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerPrefab: {fileID: 7353974686847624295, guid: 52f65099c5397fd44a08588399434940,
     type: 3}
-  _playerTransform: {fileID: 237667939}
+  _playerTransform: {fileID: 183253580}
 --- !u!1 &1464405413
 GameObject:
   m_ObjectHideFlags: 0
