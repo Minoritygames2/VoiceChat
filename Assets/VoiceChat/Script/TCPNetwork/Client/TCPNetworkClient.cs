@@ -305,6 +305,7 @@ namespace VoiceChat
             size += 4;
             var message = new byte[packet.Length - size];
             Buffer.BlockCopy(packet, size, message, 0, packet.Length - size);
+            OnReceiveVoicePacket?.Invoke(new VoiceChatPacket(playerId, (VoicePacketType)packetType, channel, message));
         }
 
         public void SessionClose()
