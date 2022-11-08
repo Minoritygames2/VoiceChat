@@ -16,7 +16,7 @@ namespace VoiceChat
         protected override void OnReceivedPacket(VoiceChatPacket voicePacket)
         {
             if (voicePacket.playerId == 0)
-                ServerPacket((int)voicePacket.packetType, voicePacket.message);
+                ServerPacket(voicePacket);
         }
 
         public void StartTcpClient(string serverIP, string micName)
@@ -27,18 +27,16 @@ namespace VoiceChat
         private void OnReceiveVoicePacket(VoiceChatPacket voicePacket)
         {
             if (voicePacket.playerId == 0)
-                ServerPacket((int)voicePacket.packetType, voicePacket.message);
+                ServerPacket(voicePacket);
             else
-                ClientPacket(voicePacket.playerId, (int)voicePacket.packetType, voicePacket.message, voicePacket.voiceData);
+                ClientPacket(voicePacket);
         }
-        private void ServerPacket(int packetType, byte[] message)
+        private void ServerPacket(VoiceChatPacket voicePacket)
         {
-            switch ((VoicePacketType)packetType)
+            switch (voicePacket.packetType)
             {
                 case VoicePacketType.ACCEPT:
-                    Debug.Log("로그인");
-                    var playerId = BitConverter.ToInt32(message, 0);
-                    _myVoicePlayer.InitVoicePlayer(playerId);
+                    _myVoicePlayer.InitVoicePlayer(voicePacket.playerId);
                     _myVoicePlayer.StartSendVoicePacket();
                     break;
                 default:
@@ -46,14 +44,14 @@ namespace VoiceChat
             }
         }
 
-        private void ClientPacket(int playerId, int packetType, byte[] message, VoiceData voicdData)
+        private void ClientPacket(VoiceChatPacket voicePacket)
         {
-            if (playerId == _myVoicePlayer.GetPlayerId())
+            if (voicePacket.playerId == _myVoicePlayer.GetPlayerId())
                 return;
-            switch ((VoicePacketType)packetType)
+            switch (voicePacket.packetType)
             {
                 case VoicePacketType.VOICE:
-                    SetVoicePacket(voicdData);
+                    SetVoicePacket(voicePacket.voiceData);
                     break;
                 default:
                     break;
