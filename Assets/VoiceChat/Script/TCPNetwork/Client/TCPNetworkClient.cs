@@ -313,9 +313,28 @@ namespace VoiceChat
             size += 4;
             var channel = BitConverter.ToInt32(packet, size);
             size += 4;
-            var message = new byte[packet.Length - size];
-            Buffer.BlockCopy(packet, size, message, 0, packet.Length - size);
-            OnReceiveVoicePacket?.Invoke(new VoiceChatPacket(playerId, (VoicePacketType)packetType, channel, message));
+            if(packetType == (int)VoicePacketType.VOICE)
+            {
+                var message = new byte[packet.Length - size];
+                Buffer.BlockCopy(packet, size, message, 0, packet.Length - size);
+                OnReceiveVoicePacket?.Invoke(new VoiceChatPacket(playerId, (VoicePacketType)packetType, channel, message));
+            }
+            else
+            {
+                var voiceIdByte = BitConverter.ToInt32(packet, size);
+                size += 4;
+
+                var voiceIndex = BitConverter.ToInt32(packet, size);
+                size += 4;
+
+                var message = new byte[packet.Length - size];
+                Buffer.BlockCopy(packet, size, message, 0, packet.Length - size);
+                OnReceiveVoicePacket?.Invoke(new VoiceChatPacket(playerId, (VoicePacketType)packetType, channel, new VoiceData() {
+                    networkId = playerId, voiceID = voiceIdByte, voiceIndex = voiceIndex, voiceArray = message
+                }));
+            }
+            
+            
         }
 
         public void SessionClose()
