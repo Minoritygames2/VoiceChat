@@ -119,6 +119,7 @@ namespace VoiceChat
         {
             try
             {
+                Debug.Log("송신시작");
                 Socket socket = (Socket)asyncResult.AsyncState;
                 var rsltSize = socket.EndSend(asyncResult);
                 OnSendPacket();
@@ -154,7 +155,10 @@ namespace VoiceChat
             try
             {
                 if (_isConnected != 2)
+                {
+                    StartClientBeginReceive();
                     return;
+                }
 
                 AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
                 var rslt = asyncObj.receiveObj[0];
