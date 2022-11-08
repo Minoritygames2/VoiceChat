@@ -22,7 +22,7 @@ namespace VoiceChat
             public IList<ArraySegment<byte>> receiveObj;
             public Socket socket;
         }
-        #region ÇÃ·¹ÀÌ¾î ¼¼ÆÃ
+        #region í”Œë ˆì´ì–´ ì„¸íŒ…
         private int _playerId = 0;
         public int PlayerId { get=> _playerId; set=> _playerId = value; }
         private int _channel = 0;
@@ -35,7 +35,7 @@ namespace VoiceChat
         public UnityEvent OnClientDisconnected = new UnityEvent();
         public VoiceChatPacketEvnet OnReceiveVoicePacket = new VoiceChatPacketEvnet();
 
-        //0 : Á¢¼ÓÇÏÁö¾ÊÀ½ 1 : Á¢¼ÓÁß 2 : Á¢¼Ó¿Ï·á
+        //0 : ì ‘ì†í•˜ì§€ì•ŠìŒ 1 : ì ‘ì†ì¤‘ 2 : ì ‘ì†ì™„ë£Œ
         private int _isConnected = 0;
         private int _chConnected = 0;
 
@@ -44,15 +44,15 @@ namespace VoiceChat
         private int INT_ENABLE_RECEIVE = 0;
         private int INT_UNABLE_RECEIVE = 1;
         private TCPReceiveBuffer _receiveBuffer = new TCPReceiveBuffer(4096 * 100);
-        #region Á¢¼Ó
+        #region ì ‘ì†
         /// <summary>
-        /// TCPÅ¬¶óÀÌ¾ğÆ® Á¢¼Ó
+        /// TCPí´ë¼ì´ì–¸íŠ¸ ì ‘ì†
         /// </summary>
         public void StartTcpClient(string ipStr, UnityAction OnClientConnected, UnityAction<VoiceChatPacket> OnReceiveVoicePacket)
         {
             if (_isConnected != 0)
             {
-                Debug.Log("VoiceChat :: ÀÌ¹Ì ¼­¹ö¿¡ Á¢¼ÓÁßÀÔ´Ï´Ù");
+                Debug.Log("VoiceChat :: ì´ë¯¸ ì„œë²„ì— ì ‘ì†ì¤‘ì…ë‹ˆë‹¤");
                 return;
             }
 
@@ -67,18 +67,18 @@ namespace VoiceChat
             }
             catch (Exception e)
             {
-                Debug.Log("VoiceChat :: ³×Æ®¿öÅ© :: Å¬¶óÀÌ¾ğÆ® Á¢¼Ó ½ÇÆĞ : " + e.Message);
+                Debug.Log("VoiceChat :: ë„¤íŠ¸ì›Œí¬ :: í´ë¼ì´ì–¸íŠ¸ ì ‘ì† ì‹¤íŒ¨ : " + e.Message);
             }
         }
 
         /// <summary>
-        /// TCPÅ¬¶óÀÌ¾ğÆ® Á¢¼Ó
+        /// TCPí´ë¼ì´ì–¸íŠ¸ ì ‘ì†
         /// </summary>
         public void StartTcpClient(TcpClient tcpClient, UnityAction<VoiceChatPacket> OnReceiveVoicePacket)
         {
             if (_isConnected != 0)
             {
-                Debug.Log("VoiceChat :: ÀÌ¹Ì ¼­¹ö¿¡ Á¢¼ÓÁßÀÔ´Ï´Ù");
+                Debug.Log("VoiceChat :: ì´ë¯¸ ì„œë²„ì— ì ‘ì†ì¤‘ì…ë‹ˆë‹¤");
                 return;
             }
             this.OnReceiveVoicePacket.AddListener(OnReceiveVoicePacket);
@@ -93,9 +93,9 @@ namespace VoiceChat
         }
         #endregion
 
-        #region ¼Û½Å
+        #region ì†¡ì‹ 
         /// <summary>
-        /// ÆĞÅ¶¼Û½Å
+        /// íŒ¨í‚·ì†¡ì‹ 
         /// </summary>
         private void SendPacket(ArraySegment<byte> buffer)
         {
@@ -104,13 +104,14 @@ namespace VoiceChat
 
             try
             {
+                Debug.Log("VoiceChat :: ë„¤íŠ¸ì›Œí¬ ::  ì†¡ì‹ í•©ë‹ˆë‹¤");
                 IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
                 bufferList.Add(buffer);
                 _tcpClient.Client.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), _tcpClient.Client);
             }
             catch (Exception e)
             {
-                Debug.Log("VoiceChat :: ³×Æ®¿öÅ© ::  ¼Û½Å¿¡·¯ :: " + e.Message);
+                Debug.Log("VoiceChat :: ë„¤íŠ¸ì›Œí¬ ::  ì†¡ì‹ ì—ëŸ¬ :: " + e.Message);
                 SessionClose();
             }
         }
@@ -125,19 +126,19 @@ namespace VoiceChat
             }
             catch (Exception e)
             {
-                Debug.Log("VoiceChat :: ³×Æ®¿öÅ© :: ¼Û½Å ¿¡·¯ :: " + e.Message);
+                Debug.Log("VoiceChat :: ë„¤íŠ¸ì›Œí¬ :: ì†¡ì‹  ì—ëŸ¬ :: " + e.Message);
             }
         }
 
         private void OnSendPacket()
         {
-            Debug.Log("¼Û½Å¿Ï·á");
+            Debug.Log("ì†¡ì‹ ì™„ë£Œ");
         }
         #endregion
 
-        #region ¼ö½Å
+        #region ìˆ˜ì‹ 
         /// <summary>
-        /// ¸Ş¼¼Áö ¼ö½Å ½ÃÀÛ
+        /// ë©”ì„¸ì§€ ìˆ˜ì‹  ì‹œì‘ 
         /// </summary>
         public void StartClientBeginReceive()
         {
@@ -166,7 +167,7 @@ namespace VoiceChat
             }
             catch (Exception e)
             {
-                Debug.Log("VoiceChat :: ³×Æ®¿öÅ© :: ¼ö½Å ¿¡·¯ :: " + e.Message);
+                Debug.Log("VoiceChat :: ë„¤íŠ¸ì›Œí¬ :: ìˆ˜ì‹  ì—ëŸ¬ :: " + e.Message);
                 AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
                 asyncObj.socket.EndReceive(asyncResult);
                 SessionClose();
@@ -175,7 +176,7 @@ namespace VoiceChat
         #endregion
 
 
-        #region ÆĞÅ¶°ü¸®
+        #region íŒ¨í‚·ê´€ë¦¬
 
 
         private void ParseVoicePacket(int playerId, byte[] message)
@@ -193,7 +194,7 @@ namespace VoiceChat
         }
 
         /// <summary>
-        /// ÆĞÅ¶¼Û½Å
+        /// íŒ¨í‚·ì†¡ì‹ 
         /// </summary>
         public void SendPacket(VoiceChatPacket voiceChatPacket)
         {
@@ -241,7 +242,7 @@ namespace VoiceChat
             Buffer.BlockCopy(channel, 0, rsltBuffer.Array, nowPosition, channel.Length);
             nowPosition += packetTypeByte.Length;
 
-            //¸ÇÃ³À½ Çì´õ¿¡ ÆĞÅ¶»çÀÌÁî º¸³»±â
+            //ë§¨ì²˜ìŒ í—¤ë”ì— íŒ¨í‚·ì‚¬ì´ì¦ˆ ë³´ë‚´ê¸°
             var sendDataSizeByte = BitConverter.GetBytes(sendDataSize + nowPosition);
             Buffer.BlockCopy(sendDataSizeByte, 0, rsltBuffer.Array, 0, 4);
             return rsltBuffer;
