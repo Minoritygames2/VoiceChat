@@ -32,6 +32,11 @@ namespace VoiceChat
             return client;
         }
 
+        public VoicePlayer AddTcpClient()
+        {
+            var client = Instantiate(_playerPrefab, _playerTransform).GetComponent<VoicePlayer>();
+            return client;
+        }
 
     }
 }

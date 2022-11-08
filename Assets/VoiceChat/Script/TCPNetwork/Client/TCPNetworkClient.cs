@@ -88,6 +88,7 @@ namespace VoiceChat
             StartClientBeginReceive();
         }
 
+
         private void ConnectCallback(IAsyncResult asyncResult)
         {
             _chConnected = 2;

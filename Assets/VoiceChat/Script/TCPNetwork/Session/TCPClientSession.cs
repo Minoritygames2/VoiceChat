@@ -53,13 +53,49 @@ namespace VoiceChat
             switch ((VoicePacketType)packetType)
             {
                 case VoicePacketType.VOICE:
+                    SetVoicePacket(voicdData);
                     break;
                 default:
                     break;
             }
         }
 
+        private void SetVoicePacket(VoiceData voicdData)
+        {
+            VoicePlayer client;
+            if (ClientAny(voicdData.networkId))
+                client = ClientWhere(voicdData.networkId);
+            else
+                client = AddVoiceClient(voicdData.networkId);
 
+            client.SetVoicePacketData(voicdData);
+        }
+
+        #region ClientList
+        public bool ClientAny(int playerId)
+        {
+            for(int index = 0; index < _players.Count; index ++)
+                if (_players[index].GetPlayerId() == playerId)
+                    return true;
+            return false;
+        }
+
+        public VoicePlayer ClientWhere(int playerId)
+        {
+            for (int index = 0; index < _players.Count; index++)
+                if (_players[index].GetPlayerId() == playerId)
+                    return _players[index];
+            return null;
+        }
+
+        public VoicePlayer AddVoiceClient(int playerId)
+        {
+            var newPlayer = AddTcpClient();
+            newPlayer.InitVoicePlayer(playerId);
+            _players.Add(newPlayer);
+            return newPlayer;
+        }
+        #endregion
     }
 }
 

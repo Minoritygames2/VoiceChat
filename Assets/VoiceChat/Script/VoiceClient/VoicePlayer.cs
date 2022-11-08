@@ -20,7 +20,6 @@ namespace VoiceChat
         {
             _playerId = playerId;
         }
-
         public void SetChangeMicName(string micName)
         {
             _micCapture.SetChangeMicName(micName);
@@ -34,6 +33,11 @@ namespace VoiceChat
         private void SendVoicePacket(VoiceData voiceData)
         {
             _networkClient.SendPacket(new VoiceChatPacket(_playerId, VoicePacketType.VOICE, 0, voiceData));
+        }
+
+        public void SetVoicePacketData(VoiceData voiceData)
+        {
+            _micDataSet.SetVoiceData(voiceData.voiceArray, voiceData.voiceID, voiceData.voiceIndex);
         }
     }
 
