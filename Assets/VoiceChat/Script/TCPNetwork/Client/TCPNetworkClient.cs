@@ -313,7 +313,7 @@ namespace VoiceChat
             size += 4;
             var channel = BitConverter.ToInt32(packet, size);
             size += 4;
-            if(packetType == (int)VoicePacketType.VOICE)
+            if(packetType != (int)VoicePacketType.VOICE)
             {
                 var message = new byte[packet.Length - size];
                 Buffer.BlockCopy(packet, size, message, 0, packet.Length - size);
