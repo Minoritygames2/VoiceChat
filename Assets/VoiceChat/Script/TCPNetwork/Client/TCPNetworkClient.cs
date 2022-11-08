@@ -223,10 +223,6 @@ namespace VoiceChat
 
                 Buffer.BlockCopy(voiceData.voiceArray, 0, rsltBuffer.Array, nowPosition, voiceData.voiceArray.Length);
                 nowPosition += voiceData.voiceArray.Length;
-
-                var nowPositionByte = BitConverter.GetBytes(nowPosition);
-                Buffer.BlockCopy(nowPositionByte, 0, rsltBuffer.Array, nowPosition, nowPositionByte.Length);
-                nowPosition += nowPositionByte.Length;
             }
             else
             {
@@ -234,6 +230,11 @@ namespace VoiceChat
                 .Length);
                 nowPosition += voiceChatPacket.message.Length;
             }
+
+            var nowPositionByte = BitConverter.GetBytes(nowPosition);
+            Buffer.BlockCopy(nowPositionByte, 0, rsltBuffer.Array, 0, nowPositionByte.Length);
+            nowPosition += nowPositionByte.Length;
+
             var rsltCloseBuffer = sendBuffer.CloseBuffer(nowPosition);
             Buffer.BlockCopy(rsltBuffer.Array, 0, rsltCloseBuffer.Array, 0, rsltCloseBuffer.Count);
             SendPacket(rsltCloseBuffer);
