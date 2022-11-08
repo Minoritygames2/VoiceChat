@@ -42,7 +42,7 @@ namespace VoiceChat
             var newClient = AddTcpClient(tcpClient);
             _voicePlayer.Add(newClient);
             newClient.InitVoicePlayer(_index);
-            newClient.NetworkClient.SendPacket(new VoiceChatPacket(0, VoicePacketType.ACCEPT, 0, new byte[0]));
+            newClient.NetworkClient.SendPacket(new VoiceChatPacket(0, VoicePacketType.ACCEPT, 0, BitConverter.GetBytes(_index)));
         }
 
         /// <summary>

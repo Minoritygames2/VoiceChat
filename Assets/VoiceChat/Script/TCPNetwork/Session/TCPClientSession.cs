@@ -36,7 +36,7 @@ namespace VoiceChat
             switch (voicePacket.packetType)
             {
                 case VoicePacketType.ACCEPT:
-                    _myVoicePlayer.InitVoicePlayer(voicePacket.playerId);
+                    _myVoicePlayer.InitVoicePlayer(BitConverter.ToInt32(voicePacket.message));
                     _myVoicePlayer.StartSendVoicePacket();
                     break;
                 default:
