@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -79,6 +79,7 @@ namespace VoiceChat
             _micDropDown.ClearOptions();
             List<string> searchRslt = searchMicMethod();
             searchRslt.Add(MicrophoneCapture.MicName_NONE);
+            searchRslt.Add(MicrophoneCapture.MicName_TEST);
             _micDropDown.AddOptions(searchRslt);
         }
         #endregion

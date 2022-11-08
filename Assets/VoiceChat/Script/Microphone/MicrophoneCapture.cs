@@ -9,9 +9,12 @@ namespace VoiceChat
     public class MicrophoneCapture : MonoBehaviour
     {
         public static string MicName_NONE = "None";
+        public static string MicName_TEST = "Test";
 
         [SerializeField]
         private AudioSource _micAudioSource;
+        [SerializeField]
+        private AudioClip _testAudioClip;
         private string _settingMicName = string.Empty;
 
         private bool _isStartCapture = false;
@@ -20,7 +23,7 @@ namespace VoiceChat
         private int _voiceID = 0;
 
         /// <summary>
-        /// ¸¶ÀÌÅ© Ä¸ÃÄ ½ÃÀÛ
+        /// ë§ˆì´í¬ ìº¡ì³ ì‹œì‘
         /// </summary>
         public void StartCapture(string micName, UnityAction<VoiceData> SendPacket)
         {
@@ -29,7 +32,7 @@ namespace VoiceChat
                 if (micName.Equals(MicName_NONE))
                     return;
 
-                //¸¶ÀÌÅ© ¼³Á¤ÀÌ µÇ¾îÀÖÀ» °æ¿ì ²ö´Ù
+                //ë§ˆì´í¬ ì„¤ì •ì´ ë˜ì–´ìˆì„ ê²½ìš° ëˆë‹¤
                 if (!_settingMicName.Equals(string.Empty))
                 {
                     Microphone.End(_settingMicName);
@@ -38,9 +41,12 @@ namespace VoiceChat
 
                 _settingMicName = micName;
 
-                Debug.Log("VoiceChat :: ¸¶ÀÌÅ© Ä¸ÃÄ¸¦ ½ÃÀÛÇÕ´Ï´Ù" + micName);
+                Debug.Log("VoiceChat :: ë§ˆì´í¬ ìº¡ì³ë¥¼ ì‹œì‘í•©ë‹ˆë‹¤" + micName);
 
-                _micAudioSource.clip = Microphone.Start(_settingMicName, true, 1, AudioSettings.outputSampleRate);
+                if (micName.Equals(MicName_TEST))
+                    _micAudioSource.clip = _testAudioClip;
+                else
+                    _micAudioSource.clip = Microphone.Start(_settingMicName, true, 1, AudioSettings.outputSampleRate);
                 _micAudioSource.loop = true;
                 _micAudioSource.Play();
 
@@ -50,7 +56,7 @@ namespace VoiceChat
             }
             catch (Exception e)
             {
-                Debug.Log("VoiceChat :: ¸¶ÀÌÅ© Ä¸ÃÄ ½ÇÆĞÇÏ¿´½À´Ï´Ù :: " + e.Message);
+                Debug.Log("VoiceChat :: ë§ˆì´í¬ ìº¡ì³ ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤ :: " + e.Message);
             }
         }
 

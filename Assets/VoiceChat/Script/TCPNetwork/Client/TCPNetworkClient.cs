@@ -104,7 +104,6 @@ namespace VoiceChat
 
             try
             {
-                Debug.Log("VoiceChat :: 네트워크 ::  송신합니다");
                 IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
                 bufferList.Add(buffer);
                 _tcpClient.Client.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), _tcpClient.Client);

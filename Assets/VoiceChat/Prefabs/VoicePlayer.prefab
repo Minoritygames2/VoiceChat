@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _micAudioSource: {fileID: 7353974686687230967}
+  _testAudioClip: {fileID: 8300000, guid: db1f63a9221691044ab9cf3d811d58d2, type: 3}
 --- !u!1 &7353974686677251189
 GameObject:
   m_ObjectHideFlags: 0
