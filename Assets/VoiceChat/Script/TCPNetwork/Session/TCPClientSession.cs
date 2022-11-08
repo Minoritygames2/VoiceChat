@@ -64,7 +64,11 @@ namespace VoiceChat
             if (ClientAny(voicdData.networkId))
                 client = ClientWhere(voicdData.networkId);
             else
+            {
                 client = AddVoiceClient(voicdData.networkId);
+                client.InitElsePlayerVoice();
+            }
+                
 
             client.SetVoicePacketData(voicdData);
         }

@@ -35,9 +35,9 @@ namespace VoiceChat
             _networkClient.SendPacket(new VoiceChatPacket(_playerId, VoicePacketType.VOICE, 0, voiceData));
         }
 
-        public void InitElsePlayerVoice(VoiceData voiceData)
+        public void InitElsePlayerVoice()
         {
-            _micDataSet.StartVoiceClient(voiceData.networkId);
+            _micDataSet.StartVoiceClient(_playerId);
         }
 
         public void SetVoicePacketData(VoiceData voiceData)
