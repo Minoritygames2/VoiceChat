@@ -221,7 +221,6 @@ namespace VoiceChat
             }
             var nowPositionByte = BitConverter.GetBytes(nowPosition);
             Buffer.BlockCopy(nowPositionByte, 0, rsltBuffer.Array, 0, nowPositionByte.Length);
-            Debug.Log("nowPosition : " + nowPosition);
             var rsltCloseBuffer = sendBuffer.CloseBuffer(nowPosition);
             Buffer.BlockCopy(rsltBuffer.Array, 0, rsltCloseBuffer.Array, 0, rsltCloseBuffer.Count);
             SendPacket(rsltCloseBuffer);
