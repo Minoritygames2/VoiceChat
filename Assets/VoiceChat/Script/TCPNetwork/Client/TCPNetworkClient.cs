@@ -85,6 +85,7 @@ namespace VoiceChat
             _chConnected = 2;
             _isConnected = 2;
             _tcpClient = tcpClient;
+            StartClientBeginReceive();
         }
 
         private void ConnectCallback(IAsyncResult asyncResult)
@@ -164,12 +165,9 @@ namespace VoiceChat
                     StartClientBeginReceive();
                     return;
                 }
-                Debug.Log("수신 2");
-
                 AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
                 var rslt = asyncObj.receiveObj[0];
                 var rsltSize = asyncObj.socket.EndReceive(asyncResult);
-                Debug.Log("수신 3");
                 if (rsltSize > 0)
                     _receiveQueue.Enqueue(new ArraySegment<byte>(rslt.Array, 0, rsltSize));
                 StartClientBeginReceive();
@@ -214,6 +212,7 @@ namespace VoiceChat
             if (voiceChatPacket.packetType == VoicePacketType.VOICE)
             {
                 var voiceData = voiceChatPacket.voiceData;
+
                 var voiceIdByte = BitConverter.GetBytes(voiceData.voiceID);
                 Buffer.BlockCopy(voiceIdByte, 0, rsltBuffer.Array, nowPosition, voiceIdByte.Length);
                 nowPosition += voiceIdByte.Length;
@@ -224,6 +223,10 @@ namespace VoiceChat
 
                 Buffer.BlockCopy(voiceData.voiceArray, 0, rsltBuffer.Array, nowPosition, voiceData.voiceArray.Length);
                 nowPosition += voiceData.voiceArray.Length;
+
+                var nowPositionByte = BitConverter.GetBytes(nowPosition);
+                Buffer.BlockCopy(nowPositionByte, 0, rsltBuffer.Array, nowPosition, nowPositionByte.Length);
+                nowPosition += nowPositionByte.Length;
             }
             else
             {
@@ -321,6 +324,11 @@ namespace VoiceChat
             OnClientConnected.RemoveAllListeners();
             OnClientDisconnected.RemoveAllListeners();
             OnReceiveVoicePacket.RemoveAllListeners();
+        }
+
+        private void OnDestroy()
+        {
+            SessionClose();
         }
 
     }
