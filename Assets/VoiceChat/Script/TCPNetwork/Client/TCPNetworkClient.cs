@@ -104,6 +104,8 @@ namespace VoiceChat
 
             try
             {
+                IPEndPoint remoteIpEndPoint = _tcpClient.Client.RemoteEndPoint as IPEndPoint;
+                Debug.Log("송신시작" + remoteIpEndPoint.Address.ToString());
                 IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
                 bufferList.Add(buffer);
                 _tcpClient.Client.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), _tcpClient.Client);
@@ -119,7 +121,7 @@ namespace VoiceChat
         {
             try
             {
-                Debug.Log("송신시작");
+                
                 Socket socket = (Socket)asyncResult.AsyncState;
                 var rsltSize = socket.EndSend(asyncResult);
                 OnSendPacket();
@@ -142,6 +144,7 @@ namespace VoiceChat
         /// </summary>
         public void StartClientBeginReceive()
         {
+            Debug.Log("수신시작" );
             if (_isConnected != 2)
                 return;
             var receiveBuffer = new ArraySegment<byte>(new byte[4096 * 100], 0, 4096 * 100);
@@ -154,16 +157,18 @@ namespace VoiceChat
         {
             try
             {
+                Debug.Log("수신 1");
                 if (_isConnected != 2)
                 {
                     StartClientBeginReceive();
                     return;
                 }
+                Debug.Log("수신 2");
 
                 AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
                 var rslt = asyncObj.receiveObj[0];
                 var rsltSize = asyncObj.socket.EndReceive(asyncResult);
-
+                Debug.Log("수신 3");
                 if (rsltSize > 0)
                     _receiveQueue.Enqueue(new ArraySegment<byte>(rslt.Array, 0, rsltSize));
                 StartClientBeginReceive();
