@@ -122,7 +122,6 @@ namespace VoiceChat
         {
             try
             {
-                Debug.Log("송신완료");
                 Socket socket = (Socket)asyncResult.AsyncState;
                 var rsltSize = socket.EndSend(asyncResult);
             }
@@ -157,7 +156,6 @@ namespace VoiceChat
                     StartClientBeginReceive();
                     return;
                 }
-                Debug.Log("수신완료");
                 AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
                 var rslt = asyncObj.receiveObj[0];
                 var rsltSize = asyncObj.socket.EndReceive(asyncResult);
@@ -221,13 +219,11 @@ namespace VoiceChat
                 .Length);
                 nowPosition += voiceChatPacket.message.Length;
             }
-            nowPosition += 4;
             var nowPositionByte = BitConverter.GetBytes(nowPosition);
             Buffer.BlockCopy(nowPositionByte, 0, rsltBuffer.Array, 0, nowPositionByte.Length);
-
+            Debug.Log("nowPosition : " + nowPosition);
             var rsltCloseBuffer = sendBuffer.CloseBuffer(nowPosition);
             Buffer.BlockCopy(rsltBuffer.Array, 0, rsltCloseBuffer.Array, 0, rsltCloseBuffer.Count);
-            Debug.Log("보내는 패킷 : " + rsltCloseBuffer.Array.Length);
             SendPacket(rsltCloseBuffer);
         }
 
@@ -298,7 +294,6 @@ namespace VoiceChat
 
         private void CheckPacket(byte[] packet)
         {
-            Debug.Log("받는 패킷 : " + packet.Length);
             int size = 0;
             var packetSize = BitConverter.ToInt32(packet, size);
             size += 4;

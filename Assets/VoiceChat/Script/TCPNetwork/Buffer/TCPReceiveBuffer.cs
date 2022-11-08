@@ -64,6 +64,7 @@ public class TCPReceiveBuffer
     }
     private void GetPacketSize(byte[] receiveByte)
     {
+        Debug.Log("_packetSize : " + _packetSize);
         _packetSize = BitConverter.ToInt32(receiveByte, 0);
     }
 }

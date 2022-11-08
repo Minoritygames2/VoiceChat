@@ -45,7 +45,6 @@ namespace VoiceChat
                 _nowVoiceId = voiceID;
                 _voiceByteDatas.Clear();
             }
-            Debug.Log("_nowVoiceId : " + _nowVoiceId);
             _voiceByteDatas.Add(new VoiceData() { voiceID = voiceID, voiceIndex = voiceIndex, voiceArray = voiceArray });
 
             if (CheckContainsIndex())
