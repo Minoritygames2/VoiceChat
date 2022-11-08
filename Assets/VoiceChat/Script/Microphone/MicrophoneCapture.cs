@@ -19,7 +19,7 @@ namespace VoiceChat
         private string _changeMicName = string.Empty;
 
         private bool _isStartCapture = false;
-        private WaitForSeconds _wait = new WaitForSeconds(1f);
+        private WaitForSeconds _wait = new WaitForSeconds(0.1f);
 
         private int _voiceID = 0;
 

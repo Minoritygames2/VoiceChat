@@ -24,11 +24,8 @@ namespace VoiceChat
 
         private int _nowVoiceId = 0;
         private List<VoiceData> _voiceByteDatas = new List<VoiceData>();
-
-        private int _timer = 0;
-        private WaitForSeconds _wait = new WaitForSeconds(0.2f);
         /// <summary>
-        /// ´Ù¸¥ Å¬¶óÀÌ¾ğÆ®·Î ¹ŞÀº Voice ½ÃÀÛ
+        /// ë‹¤ë¥¸ í´ë¼ì´ì–¸íŠ¸ë¡œ ë°›ì€ Voice ì‹œì‘
         /// </summary>
         public void StartVoiceClient(int networkId)
         {
@@ -75,9 +72,9 @@ namespace VoiceChat
         }
 
         /// <summary>
-        /// Voice ÆĞÅ¶ 1,2,3ÀÌ ´Ù µé¾î¿Ô´ÂÁö È®ÀÎ
+        /// Voice íŒ¨í‚· 1,2,3ì´ ë‹¤ ë“¤ì–´ì™”ëŠ”ì§€ í™•ì¸
         /// </summary>
-        /// <returns>TRUE : ´Ù Á¸Àç FALSE : Á¸ÀçÇÏÁö¾ÊÀ½</returns>
+        /// <returns>TRUE : ë‹¤ ì¡´ì¬ FALSE : ì¡´ì¬í•˜ì§€ì•ŠìŒ</returns>
         private bool CheckContainsIndex()
         {
             return (_voiceByteDatas.Any(_ => _.voiceIndex == 0) &&
