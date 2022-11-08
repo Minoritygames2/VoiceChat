@@ -90,6 +90,7 @@ namespace VoiceChat
         private void ConnectCallback(IAsyncResult asyncResult)
         {
             _chConnected = 2;
+            StartClientBeginReceive();
         }
         #endregion
 
