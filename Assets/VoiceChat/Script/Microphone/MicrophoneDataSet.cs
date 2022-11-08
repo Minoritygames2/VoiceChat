@@ -18,22 +18,31 @@ namespace VoiceChat
     public class MicrophoneDataSet : MonoBehaviour
     {
         [SerializeField]
-        private AudioSource _audioSource;
+        private AudioSource _audioSource1;
+        [SerializeField]
+        private AudioSource _audioSource2;
         private int _networkId;
         public int NetworkId { get => _networkId; }
 
         private int _nowVoiceId = 0;
         private List<VoiceData> _voiceByteDatas = new List<VoiceData>();
+
+        bool testBool = false;
         /// <summary>
         /// 다른 클라이언트로 받은 Voice 시작
         /// </summary>
         public void StartVoiceClient(int networkId)
         {
             _networkId = networkId;
-            _audioSource.clip = AudioClip.Create(string.Format("{0}_Voice", _networkId), 44100, 1, 44100, false);
-            _audioSource.loop = true;
-            _audioSource.mute = false;
-            _audioSource.Play();
+            _audioSource1.clip = AudioClip.Create(string.Format("{0}_Voice1", _networkId), 44100, 1, 44100, false);
+            _audioSource1.loop = true;
+            _audioSource1.mute = false;
+            _audioSource1.Play();
+
+            _audioSource2.clip = AudioClip.Create(string.Format("{0}_Voice2", _networkId), 44100, 1, 44100, false);
+            _audioSource2.loop = true;
+            _audioSource2.mute = false;
+            _audioSource2.Play();
         }
 
         public void SetVoiceData(byte[] voiceArray, int voiceID, int voiceIndex)
@@ -66,8 +75,22 @@ namespace VoiceChat
                     Buffer.BlockCopy(floatIndexData, 0, receivedFloatData, nowPosition, floatIndexData.Length);
                     nowPosition += floatIndexData.Length;
                 }
-                _audioSource.clip.SetData(receivedFloatData, 0);
-                _audioSource.Play();
+                if(testBool)
+                {
+                    _audioSource2.Stop();
+                    _audioSource1.clip.SetData(receivedFloatData, 0);
+                    _audioSource1.Play();
+                    testBool = false;
+                }
+                else
+                {
+                    _audioSource1.Stop();
+                    _audioSource2.clip.SetData(receivedFloatData, 0);
+                    _audioSource2.Play();
+
+                    testBool = true;
+                }
+                
             }
         }
 
