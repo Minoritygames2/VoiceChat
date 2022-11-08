@@ -91,7 +91,6 @@ namespace VoiceChat
         private void ConnectCallback(IAsyncResult asyncResult)
         {
             _chConnected = 2;
-            StartClientBeginReceive();
         }
         #endregion
 
@@ -106,8 +105,6 @@ namespace VoiceChat
 
             try
             {
-                IPEndPoint remoteIpEndPoint = _tcpClient.Client.RemoteEndPoint as IPEndPoint;
-                Debug.Log("송신시작" + remoteIpEndPoint.Address.ToString());
                 IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
                 bufferList.Add(buffer);
                 _tcpClient.Client.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), _tcpClient.Client);
@@ -123,10 +120,8 @@ namespace VoiceChat
         {
             try
             {
-                
                 Socket socket = (Socket)asyncResult.AsyncState;
                 var rsltSize = socket.EndSend(asyncResult);
-                OnSendPacket();
             }
             catch (Exception e)
             {
@@ -134,10 +129,6 @@ namespace VoiceChat
             }
         }
 
-        private void OnSendPacket()
-        {
-            Debug.Log("송신완료");
-        }
         #endregion
 
         #region 수신
@@ -146,7 +137,6 @@ namespace VoiceChat
         /// </summary>
         public void StartClientBeginReceive()
         {
-            Debug.Log("수신시작" );
             if (_isConnected != 2)
                 return;
             var receiveBuffer = new ArraySegment<byte>(new byte[4096 * 100], 0, 4096 * 100);
@@ -159,7 +149,6 @@ namespace VoiceChat
         {
             try
             {
-                Debug.Log("수신 1");
                 if (_isConnected != 2)
                 {
                     StartClientBeginReceive();
@@ -175,8 +164,6 @@ namespace VoiceChat
             catch (Exception e)
             {
                 Debug.Log("VoiceChat :: 네트워크 :: 수신 에러 :: " + e.Message);
-                AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
-                asyncObj.socket.EndReceive(asyncResult);
                 SessionClose();
             }
         }
@@ -266,8 +253,10 @@ namespace VoiceChat
         {
             if(_chConnected != _isConnected)
             {
-                if(_chConnected == 0)
+                _isConnected = _chConnected;
+                if (_chConnected == 0)
                 {
+                    SessionClose();
                     OnClientDisconnected?.Invoke();
                 }
                 else if (_chConnected == 1)
@@ -276,9 +265,9 @@ namespace VoiceChat
                 }
                 else if (_chConnected == 2)
                 {
+                    StartClientBeginReceive();
                     OnClientConnected?.Invoke();
                 }
-                _isConnected = _chConnected;
             }
 
             if (_receiveQueue.Count > 0)

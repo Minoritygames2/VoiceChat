@@ -21,14 +21,12 @@ namespace VoiceChat
 
         public void StartTcpClient(string serverIP, string micName)
         {
-            _myVoicePlayer = AddTcpClient(serverIP, ()=>{ _myVoicePlayer.StartSendVoicePacket(micName); }, OnReceiveVoicePacket);
+            _myVoicePlayer = AddTcpClient(serverIP, ()=>{ _myVoicePlayer.SetChangeMicName(micName); }, OnReceiveVoicePacket);
         }
 
         private void OnReceiveVoicePacket(VoiceChatPacket voicePacket)
         {
-            if (voicePacket.playerId == _myVoicePlayer.GetPlayerId())
-                return;
-            else if (voicePacket.playerId == 0)
+            if (voicePacket.playerId == 0)
                 ServerPacket((int)voicePacket.packetType, voicePacket.message);
             else
                 ClientPacket(voicePacket.playerId, (int)voicePacket.packetType, voicePacket.message, voicePacket.voiceData);
@@ -38,8 +36,10 @@ namespace VoiceChat
             switch ((VoicePacketType)packetType)
             {
                 case VoicePacketType.ACCEPT:
+                    Debug.Log("로그인");
                     var playerId = BitConverter.ToInt32(message, 0);
                     _myVoicePlayer.InitVoicePlayer(playerId);
+                    _myVoicePlayer.StartSendVoicePacket();
                     break;
                 default:
                     break;
@@ -48,6 +48,8 @@ namespace VoiceChat
 
         private void ClientPacket(int playerId, int packetType, byte[] message, VoiceData voicdData)
         {
+            if (playerId == _myVoicePlayer.GetPlayerId())
+                return;
             switch ((VoicePacketType)packetType)
             {
                 case VoicePacketType.VOICE:

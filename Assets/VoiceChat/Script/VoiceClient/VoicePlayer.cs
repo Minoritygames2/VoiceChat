@@ -21,9 +21,14 @@ namespace VoiceChat
             _playerId = playerId;
         }
 
-        public void StartSendVoicePacket(string micName)
+        public void SetChangeMicName(string micName)
         {
-            _micCapture.StartCapture(micName, SendVoicePacket);
+            _micCapture.SetChangeMicName(micName);
+        }
+
+        public void StartSendVoicePacket()
+        {
+            _micCapture.StartCapture(SendVoicePacket);
         }
 
         private void SendVoicePacket(VoiceData voiceData)

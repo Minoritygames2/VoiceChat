@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -65,6 +65,5 @@ public class TCPReceiveBuffer
     private void GetPacketSize(byte[] receiveByte)
     {
         _packetSize = BitConverter.ToInt32(receiveByte, 0);
-        Debug.Log("_packetSize : " + _packetSize);
     }
 }

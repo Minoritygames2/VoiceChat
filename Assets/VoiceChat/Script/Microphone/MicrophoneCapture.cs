@@ -16,20 +16,25 @@ namespace VoiceChat
         [SerializeField]
         private AudioClip _testAudioClip;
         private string _settingMicName = string.Empty;
+        private string _changeMicName = string.Empty;
 
         private bool _isStartCapture = false;
         private WaitForSeconds _wait = new WaitForSeconds(1f);
 
         private int _voiceID = 0;
 
+        public void SetChangeMicName(string micName)
+        {
+            _changeMicName = micName;
+        }
         /// <summary>
         /// 마이크 캡쳐 시작
         /// </summary>
-        public void StartCapture(string micName, UnityAction<VoiceData> SendPacket)
+        public void StartCapture(UnityAction<VoiceData> SendPacket)
         {
             try
             {
-                if (micName.Equals(MicName_NONE))
+                if (_changeMicName.Equals(MicName_NONE))
                     return;
 
                 //마이크 설정이 되어있을 경우 끈다
@@ -39,11 +44,11 @@ namespace VoiceChat
                     _settingMicName = string.Empty;
                 }
 
-                _settingMicName = micName;
+                _settingMicName = _changeMicName;
 
-                Debug.Log("VoiceChat :: 마이크 캡쳐를 시작합니다" + micName);
+                Debug.Log("VoiceChat :: 마이크 캡쳐를 시작합니다" + _changeMicName);
 
-                if (micName.Equals(MicName_TEST))
+                if (_changeMicName.Equals(MicName_TEST))
                     _micAudioSource.clip = _testAudioClip;
                 else
                     _micAudioSource.clip = Microphone.Start(_settingMicName, true, 1, AudioSettings.outputSampleRate);
