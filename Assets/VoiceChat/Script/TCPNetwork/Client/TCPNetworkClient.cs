@@ -105,6 +105,7 @@ namespace VoiceChat
 
             try
             {
+                
                 IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
                 bufferList.Add(buffer);
                 _tcpClient.Client.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), _tcpClient.Client);
@@ -120,6 +121,7 @@ namespace VoiceChat
         {
             try
             {
+                Debug.Log("송신완료");
                 Socket socket = (Socket)asyncResult.AsyncState;
                 var rsltSize = socket.EndSend(asyncResult);
             }
@@ -154,6 +156,7 @@ namespace VoiceChat
                     StartClientBeginReceive();
                     return;
                 }
+                Debug.Log("수신완료");
                 AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
                 var rslt = asyncObj.receiveObj[0];
                 var rsltSize = asyncObj.socket.EndReceive(asyncResult);
