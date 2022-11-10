@@ -314,7 +314,7 @@ namespace VoiceChat
         public void SessionClose()
         {
             _chConnected = 0;
-            if(_tcpClient.Connected)
+            if(_tcpClient.Client != null && _tcpClient.Connected)
                 _tcpClient.Client.Close();
             OnClientConnected.RemoveAllListeners();
             OnClientDisconnected.RemoveAllListeners();
