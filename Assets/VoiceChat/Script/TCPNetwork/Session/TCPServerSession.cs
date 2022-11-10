@@ -27,6 +27,7 @@ namespace VoiceChat
                 case VoicePacketType.CONNECT_RESPONCE:
                     break;
                 case VoicePacketType.DISCONNECT_REQUEST:
+                    
                     break;
                 case VoicePacketType.DISCONNECT_RESPONCE:
                     break;
@@ -48,6 +49,20 @@ namespace VoiceChat
         }
 
         /// <summary>
+        /// 클라이언트 접속종료
+        /// </summary>
+        private void RemovePlayer(VoiceChatPacket voicePacket)
+        {
+            if (AnyClient(voicePacket.playerId))
+            {
+                var disconnectClient = WhereClient(voicePacket.playerId);
+                _voicePlayer.Remove(disconnectClient);
+                var playerIdByte = BitConverter.GetBytes(voicePacket.playerId);
+                SendPacketToClient(new VoiceChatPacket(0, VoicePacketType.DISCONNECT_RESPONCE, 0, playerIdByte));
+            }
+        }
+
+        /// <summary>
         /// 클라이언트들에게 패킷을 보낸다
         /// </summary>
         /// <param name="voicePacket">보낼패킷</param>
@@ -60,6 +75,22 @@ namespace VoiceChat
                 _voicePlayer[index].NetworkClient.SendPacket(voicePacket);
             }
         }
+
+        private bool AnyClient(int playerId)
+        {
+            for (int index = 0; index < _voicePlayer.Count; index++)
+                if (_voicePlayer[index].GetPlayerId() == playerId)
+                    return true;
+            return false;
+        }
+
+        private VoicePlayer WhereClient(int playerId)
+        {
+            for (int index = 0; index < _voicePlayer.Count; index++)
+                if (_voicePlayer[index].GetPlayerId() == playerId)
+                    return _voicePlayer[index];
+            return null;
+        }
     }
-}
+} 
 

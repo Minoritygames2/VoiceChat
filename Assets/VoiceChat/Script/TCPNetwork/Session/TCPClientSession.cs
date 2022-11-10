@@ -45,6 +45,9 @@ namespace VoiceChat
                     _myVoicePlayer.InitVoicePlayer(BitConverter.ToInt32(voicePacket.message));
                     _myVoicePlayer.StartSendVoicePacket();
                     break;
+                case VoicePacketType.DISCONNECT_RESPONCE:
+                    Debug.Log(string.Format("네트워크 :: {0}번 플레이어 로그아웃", voicePacket.playerId));
+                    break;
                 default:
                     break;
             }
