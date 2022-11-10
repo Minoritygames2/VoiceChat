@@ -13,17 +13,20 @@ namespace VoiceChat
     {
         [SerializeField]
         private InputField _inputPort;
-        [SerializeField]
+        [SerializeField, Header("StartServer")]
         private Button _btnStartServer;
         [SerializeField]
         private Transform _startServer;
         [SerializeField]
         private Transform _startedServer;
-        [SerializeField]
+        [SerializeField, Header("DetectServer")]
         private Button _btnDetectedServer;
         [SerializeField]
         private Text _txtDetectedTime;
-
+        [SerializeField, Header("Player")]
+        private Transform _logInPlayerTransform;
+        [SerializeField]
+        private GameObject _canvasPlayerItemPrefab;
 
         public void InitButtons(UnityAction<string> onStartBtnClick, UnityAction<string> onDetectBtnClick)
         {
@@ -45,7 +48,7 @@ namespace VoiceChat
             });
         }
 
-
+        #region 서버
         /// <summary>
         /// 서버 기동 완료
         /// </summary>
@@ -76,5 +79,14 @@ namespace VoiceChat
         {
             _txtDetectedTime.gameObject.SetActive(false);
         }
+        #endregion
+
+        public CanvasPlayerItem CreateCanvasPlayerItem(int playerID)
+        {
+            var canvasPlayer = Instantiate(_canvasPlayerItemPrefab, _logInPlayerTransform).GetComponent<CanvasPlayerItem>();
+            canvasPlayer.InitPlayerItem(playerID);
+            return canvasPlayer;
+        }
+
     }
 }

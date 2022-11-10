@@ -30,7 +30,6 @@ namespace VoiceChat
             _tcpListener.StartTCPListener(portNo, OnStartedServer);
         }
 
-
         /// <summary>
         /// 서버 서치허용
         /// </summary>
@@ -46,7 +45,6 @@ namespace VoiceChat
             }
             _udpSender.ConnectBroadcastUDPClient(portNo);
         }
-
 
         public string GetLocalIPv4()
         {

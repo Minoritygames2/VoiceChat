@@ -16,6 +16,7 @@ namespace VoiceChat
         private UdpClient _udpClient;
         private IPEndPoint _endPoint;
 
+        private bool _isStarted = false;
         /// <summary>
         /// UDP 수신처 초기화
         /// </summary>
@@ -23,6 +24,8 @@ namespace VoiceChat
         {
             if (_udpClient != null)
                 _udpClient.Close();
+
+            _isStarted = true;
 
             _udpClient = new UdpClient();
             _endPoint = new IPEndPoint(IPAddress.Broadcast, port);
@@ -36,8 +39,10 @@ namespace VoiceChat
 
         public void StopUDPSender()
         {
-            if(_udpClient.Client.Connected)
+            if(_isStarted)
                 _udpClient.Close();
+
+            _isStarted = false;
         }
 
         /// <summary>
@@ -48,6 +53,8 @@ namespace VoiceChat
         {
             try
             {
+                if (!_isStarted)
+                    return;
                 _udpClient.BeginSend(packet, packet.Length, new AsyncCallback(SendCallback), _udpClient);
             }
             catch(Exception e)
@@ -58,6 +65,8 @@ namespace VoiceChat
 
         private void SendCallback(IAsyncResult asyncResult)
         {
+            if (!_isStarted)
+                return;
             UdpClient udpClient = (UdpClient)asyncResult.AsyncState;
             udpClient.EndSend(asyncResult);
         }

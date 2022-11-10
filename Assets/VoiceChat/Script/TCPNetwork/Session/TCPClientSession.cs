@@ -13,6 +13,9 @@ namespace VoiceChat
     {
         private VoicePlayer _myVoicePlayer;
         private List<VoicePlayer> _players = new List<VoicePlayer>();
+
+        [SerializeField]
+        private VoiceClientRoomCtrl _clientRoomCtrl;
         protected override void OnReceivedPacket(VoiceChatPacket voicePacket)
         {
             if (voicePacket.playerId == 0)
@@ -42,7 +45,7 @@ namespace VoiceChat
             switch (voicePacket.packetType)
             {
                 case VoicePacketType.ACCEPT:
-                    _myVoicePlayer.InitVoicePlayer(BitConverter.ToInt32(voicePacket.message));
+                    _myVoicePlayer.InitVoicePlayer(BitConverter.ToInt32(voicePacket.message), _clientRoomCtrl.CreateCanvasPlayerItem(voicePacket.playerId));
                     _myVoicePlayer.StartSendVoicePacket();
                     break;
                 case VoicePacketType.DISCONNECT_RESPONCE:
@@ -105,7 +108,7 @@ namespace VoiceChat
         public VoicePlayer AddVoiceClient(int playerId)
         {
             var newPlayer = AddTcpClient();
-            newPlayer.InitVoicePlayer(playerId);
+            newPlayer.InitVoicePlayer(playerId, _clientRoomCtrl.CreateCanvasPlayerItem(playerId));
             _players.Add(newPlayer);
             return newPlayer;
         }

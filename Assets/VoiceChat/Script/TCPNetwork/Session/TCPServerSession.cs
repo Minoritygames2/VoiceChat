@@ -14,6 +14,9 @@ namespace VoiceChat
 
         private List<VoicePlayer> _voicePlayer = new List<VoicePlayer>();
         private int _index = 0;
+
+        [SerializeField]
+        private ServerCanvasController _canvasController;
         protected override void OnReceivedPacket(VoiceChatPacket voicePacket)
         {
             switch(voicePacket.packetType)
@@ -44,7 +47,7 @@ namespace VoiceChat
             _index++;
             var newClient = AddTcpClient(tcpClient);
             _voicePlayer.Add(newClient);
-            newClient.InitVoicePlayer(_index);
+            newClient.InitVoicePlayer(_index, _canvasController.CreateCanvasPlayerItem(_index));
             newClient.NetworkClient.SendPacket(new VoiceChatPacket(0, VoicePacketType.ACCEPT, 0, BitConverter.GetBytes(_index)));
         }
 

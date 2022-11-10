@@ -16,9 +16,12 @@ namespace VoiceChat
         private MicrophoneCapture _micCapture;
         [SerializeField]
         private MicrophoneDataSet _micDataSet;
-        public void InitVoicePlayer(int playerId)
+
+        private CanvasPlayerItem _canvasItem;
+        public void InitVoicePlayer(int playerId, CanvasPlayerItem canvasItem)
         {
             _playerId = playerId;
+            _canvasItem = canvasItem;
         }
         public void SetChangeMicName(string micName)
         {

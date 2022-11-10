@@ -17,6 +17,12 @@ namespace VoiceChat
         [Header("MIC")]
         [SerializeField]
         private MicrophoneController _micCtrl;
+
+        [Header("Player Canvas")]
+        [SerializeField]
+        private Transform _logInPlayerTransform;
+        [SerializeField]
+        private GameObject _canvasPlayerItemPrefab;
         public void StartVoiceChat(string micName, string serverIp, UnityAction onDisconnected)
         {
             //VoiceChat Room Active상태로
@@ -33,6 +39,13 @@ namespace VoiceChat
         {
             _clientSession.StopTcpClient();
             _roomCanvasCtrl.UnactiveRoomArea();
+        }
+
+        public CanvasPlayerItem CreateCanvasPlayerItem(int playerID)
+        {
+            var canvasPlayer = Instantiate(_canvasPlayerItemPrefab, _logInPlayerTransform).GetComponent<CanvasPlayerItem>();
+            canvasPlayer.InitPlayerItem(playerID);
+            return canvasPlayer;
         }
     }
 }
