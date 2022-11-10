@@ -156,6 +156,7 @@ namespace VoiceChat
                     StartClientBeginReceive();
                     return;
                 }
+
                 AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
                 var rslt = asyncObj.receiveObj[0];
                 var rsltSize = asyncObj.socket.EndReceive(asyncResult);
@@ -173,21 +174,6 @@ namespace VoiceChat
 
 
         #region 패킷관리
-
-
-        private void ParseVoicePacket(int playerId, byte[] message)
-        {
-            int size = 0;
-            var voiceId = BitConverter.ToInt32(message, size);
-            size += 4;
-
-            var voiceIndex = BitConverter.ToInt32(message, size);
-            size += 4;
-
-            var voicePacket = new byte[message.Length - size];
-            Buffer.BlockCopy(message, size, voicePacket, 0, message.Length - size);
-            VoiceData voiceData = new VoiceData() { networkId = playerId, voiceID = voiceId, voiceIndex = voiceIndex, voiceArray = voicePacket };
-        }
 
         /// <summary>
         /// 패킷송신
@@ -329,7 +315,8 @@ namespace VoiceChat
         public void SessionClose()
         {
             _chConnected = 0;
-            _tcpClient.Client.Close();
+            if(_tcpClient.Connected)
+                _tcpClient.Client.Close();
             OnClientConnected.RemoveAllListeners();
             OnClientDisconnected.RemoveAllListeners();
             OnReceiveVoicePacket.RemoveAllListeners();

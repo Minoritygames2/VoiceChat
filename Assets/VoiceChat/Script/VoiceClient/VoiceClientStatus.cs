@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -23,7 +23,8 @@ namespace VoiceChat
         ACCEPT,
         CONNECT_REQUEST,
         CONNECT_RESPONCE,
-        DISCONNECT,
+        DISCONNECT_REQUEST,
+        DISCONNECT_RESPONCE,
         MESSAGE,
         VOICE
     }

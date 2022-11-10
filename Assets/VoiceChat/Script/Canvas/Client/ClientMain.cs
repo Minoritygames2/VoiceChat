@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -50,8 +50,10 @@ namespace VoiceChat
         {
             Debug.Log("세팅값 : MicName : " + micName + " ipAddress : " + ipAddress);
             //SettingArea 끄기
+            _udpReceiver.StopUDPReceiver();
             _settingCanvas.UnactiveSettingArea();
-            _voiceClientRoom.StartVoiceChat(micName, ipAddress);
+            _voiceClientRoom.StartVoiceChat(micName, ipAddress, StartSetting);
         }
+
     }
 }

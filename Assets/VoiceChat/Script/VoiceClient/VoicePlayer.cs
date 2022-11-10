@@ -44,6 +44,12 @@ namespace VoiceChat
         {
             _micDataSet.SetVoiceData(voiceData.voiceArray, voiceData.voiceID, voiceData.voiceIndex);
         }
+        
+        public void StopVoicePlayer()
+        {
+            _networkClient.SessionClose();
+            _micCapture.StopCapture();
+        }
     }
 
 }

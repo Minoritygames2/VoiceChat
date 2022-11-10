@@ -23,6 +23,12 @@ namespace VoiceChat
         {
             _myVoicePlayer = AddTcpClient(serverIP, ()=>{ _myVoicePlayer.SetChangeMicName(micName); }, OnReceiveVoicePacket);
         }
+        
+        public void StopTcpClient()
+        {
+            _myVoicePlayer.StopVoicePlayer();
+            _players.Clear();
+        }
 
         private void OnReceiveVoicePacket(VoiceChatPacket voicePacket)
         {

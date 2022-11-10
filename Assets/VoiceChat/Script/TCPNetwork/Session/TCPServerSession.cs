@@ -26,7 +26,9 @@ namespace VoiceChat
                     break;
                 case VoicePacketType.CONNECT_RESPONCE:
                     break;
-                case VoicePacketType.DISCONNECT:
+                case VoicePacketType.DISCONNECT_REQUEST:
+                    break;
+                case VoicePacketType.DISCONNECT_RESPONCE:
                     break;
                 case VoicePacketType.MESSAGE:
                     break;

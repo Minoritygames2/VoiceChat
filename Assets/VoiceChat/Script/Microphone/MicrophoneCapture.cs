@@ -93,6 +93,13 @@ namespace VoiceChat
                 yield return _wait;
             }
         }
+
+        public void StopCapture()
+        {
+            StopAllCoroutines();
+            _isStartCapture = false;
+            _micAudioSource.Stop();
+        }
     }
 
 }

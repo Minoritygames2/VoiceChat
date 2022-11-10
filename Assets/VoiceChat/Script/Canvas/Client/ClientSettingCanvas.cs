@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -35,7 +37,6 @@ namespace VoiceChat
         private GameObject _serverButtonItem;
 
         List<BTN_ServerSearchItem> _serverSearchBtnItem = new List<BTN_ServerSearchItem>();
-
         private WaitForSeconds _wait = new WaitForSeconds(0.1f);
         private bool _isSearch = false;
         private int _searchWaitTime = 0;
@@ -53,6 +54,8 @@ namespace VoiceChat
                 endSettingCallback(micName, ipAddress);
             });
 
+            _txtSearchTime.gameObject.SetActive(false);
+
             //마이크 서치 버튼 클릭 ==>> 마이크 서치
             _micSearchBtn.onClick.AddListener(() => { SearchMic(searchMic); });
 
@@ -67,7 +70,14 @@ namespace VoiceChat
 
         public void UnactiveSettingArea()
         {
+            _isSearch = false;
+            StopAllCoroutines();
+
+            ClearSeachedItem();
+            _endSettingCallback.RemoveAllListeners();
             _micSearchBtn.onClick.RemoveAllListeners();
+            _btnServerSearch.onClick.RemoveAllListeners();
+            _settingArea.gameObject.SetActive(false);
         }
 
         #region 마이크 설정
@@ -138,6 +148,9 @@ namespace VoiceChat
         /// </summary>
         public void OnSearchedServer(ServerDetected serverDetected)
         {
+            if (!_isSearch)
+                return;
+
             if (CheckHasServerItem(serverDetected.ServerIP))
                 return;
 
@@ -165,12 +178,12 @@ namespace VoiceChat
         /// </summary>
         private void ClearSeachedItem()
         {
-            foreach(var serchedItem in _serverSearchBtnItem)
+            for(int index = 0; index < _serverSearchBtnItem.Count; index++)
             {
-                _serverSearchBtnItem.Remove(serchedItem);
-                Destroy(serchedItem.gameObject);
-            }
-            
+                Destroy(_serverSearchBtnItem[index].gameObject);
+            }    
+
+            _serverSearchBtnItem.Clear();
         }
         #endregion
     }

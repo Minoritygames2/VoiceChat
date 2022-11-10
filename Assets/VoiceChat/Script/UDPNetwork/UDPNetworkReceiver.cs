@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -102,6 +102,9 @@ namespace VoiceChat
             while (Interlocked.CompareExchange(ref _isAlbleQueue, INT_UNABLE_CHANGE, INT_ENABLE_CHANGE) == INT_ENABLE_CHANGE)
             {
             }
+            if (!_isStartedNetwork)
+                return;
+
             _queue.Enqueue(packet);
             Interlocked.Exchange(ref _isAlbleQueue, INT_ENABLE_CHANGE);
         }
@@ -126,6 +129,8 @@ namespace VoiceChat
 
         public void StopUDPReceiver()
         {
+            if (!_isStartedNetwork)
+                return;
             _isStartedNetwork = false;
             _udpClient.Close();
             _queue = new ConcurrentQueue<ServerDetected>();
