@@ -49,7 +49,7 @@ namespace VoiceChat
                     if (voicePacket.playerId == _myVoicePlayer.GetPlayerId())
                         _myVoicePlayer.StopVoicePlayer();
                     else
-                        Debug.Log(string.Format("네트워크 :: {0}번 플레이어 로그아웃", voicePacket.playerId));
+                        RemoveVoiceClient(voicePacket.playerId);
                     break;
                 default:
                     break;
@@ -108,6 +108,17 @@ namespace VoiceChat
             newPlayer.InitVoicePlayer(playerId);
             _players.Add(newPlayer);
             return newPlayer;
+        }
+
+        public void RemoveVoiceClient(int playerId)
+        {
+            if(ClientAny(playerId))
+            {
+                var client = ClientWhere(playerId);
+                _players.Remove(client);
+                Destroy(client.gameObject);
+                Debug.Log(string.Format("네트워크 :: {0}번 플레이어 로그아웃", playerId));
+            }
         }
         #endregion
     }

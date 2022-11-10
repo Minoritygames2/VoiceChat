@@ -59,6 +59,8 @@ namespace VoiceChat
                 _voicePlayer.Remove(disconnectClient);
                 var playerIdByte = BitConverter.GetBytes(playerId);
                 SendPacketToClient(new VoiceChatPacket(0, VoicePacketType.DISCONNECT_RESPONCE, 0, playerIdByte));
+
+                Destroy(disconnectClient.gameObject);
             }
         }
 
