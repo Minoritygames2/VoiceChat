@@ -47,10 +47,7 @@ namespace VoiceChat
         
         public void StopVoicePlayer()
         {
-            //Disconnect 보내기
-            _networkClient.SendPacket(new VoiceChatPacket(_playerId, VoicePacketType.DISCONNECT_REQUEST, 0, new byte[0]));
-            //접속끊기
-            _networkClient.SessionClose();
+            _networkClient.DisconnectClient();
             _micCapture.StopCapture();
         }
     }

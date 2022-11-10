@@ -12,9 +12,9 @@ namespace VoiceChat
 {
     public class TCPNetworkClient : MonoBehaviour
     {
-        public class AsyncObject
+        public class ReceiveObject
         {
-            public AsyncObject(IList<ArraySegment<byte>> receiveObj, Socket socket)
+            public ReceiveObject(IList<ArraySegment<byte>> receiveObj, Socket socket)
             {
                 this.receiveObj = receiveObj;
                 this.socket = socket;
@@ -22,6 +22,27 @@ namespace VoiceChat
             public IList<ArraySegment<byte>> receiveObj;
             public Socket socket;
         }
+        public class SendObject
+        {
+            public SendObject(IList<ArraySegment<byte>> sendObj, Socket socket)
+            {
+                this.sendObj = sendObj;
+                this.socket = socket;
+                hasCallback = false;
+            }
+            public SendObject(IList<ArraySegment<byte>> sendObj, Socket socket, UnityAction callback)
+            {
+                this.sendObj = sendObj;
+                this.socket = socket;
+                hasCallback = true;
+                this.callback = callback;
+            }
+            public IList<ArraySegment<byte>> sendObj;
+            public Socket socket;
+            public bool hasCallback;
+            public UnityAction callback;
+        }
+
         #region 플레이어 세팅
         private int _playerId = 0;
         public int PlayerId { get=> _playerId; set=> _playerId = value; }
@@ -33,6 +54,7 @@ namespace VoiceChat
         private TcpClient _tcpClient;
         public UnityEvent OnClientConnected = new UnityEvent();
         public UnityEvent OnClientDisconnected = new UnityEvent();
+        public UnityEvent OnSendVoicePacket = new UnityEvent();
         public VoiceChatPacketEvnet OnReceiveVoicePacket = new VoiceChatPacketEvnet();
 
         //0 : 접속하지않음 1 : 접속중 2 : 접속완료
@@ -93,23 +115,31 @@ namespace VoiceChat
         {
             _chConnected = 2;
         }
+
+        public void DisconnectClient()
+        {
+            //Disconnect 보내기
+            SendPacket(new VoiceChatPacket(_playerId, VoicePacketType.DISCONNECT_REQUEST, 0, new byte[0]), SessionClose);
+        }
         #endregion
 
         #region 송신
         /// <summary>
         /// 패킷송신
         /// </summary>
-        private void SendPacket(ArraySegment<byte> buffer)
+        private void SendPacket(ArraySegment<byte> buffer, UnityAction callback = null)
         {
             if (_isConnected != 2)
                 return;
 
             try
             {
-                
                 IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
                 bufferList.Add(buffer);
-                _tcpClient.Client.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), _tcpClient.Client);
+                if(callback == null)
+                    _tcpClient.Client.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), new SendObject(bufferList, _tcpClient.Client));
+                else
+                    _tcpClient.Client.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), new SendObject(bufferList, _tcpClient.Client, callback));
             }
             catch (Exception e)
             {
@@ -122,8 +152,10 @@ namespace VoiceChat
         {
             try
             {
-                Socket socket = (Socket)asyncResult.AsyncState;
-                var rsltSize = socket.EndSend(asyncResult);
+                SendObject asyncObj = (SendObject)asyncResult.AsyncState;
+                asyncObj.socket.EndSend(asyncResult);
+                if(asyncObj.hasCallback)
+                    asyncObj.callback?.Invoke();
             }
             catch (Exception e)
             {
@@ -144,7 +176,7 @@ namespace VoiceChat
             var receiveBuffer = new ArraySegment<byte>(new byte[4096 * 100], 0, 4096 * 100);
             IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
             bufferList.Add(receiveBuffer);
-            _tcpClient.Client.BeginReceive(bufferList, SocketFlags.None, new AsyncCallback(ReceiveCallback), new AsyncObject(bufferList, _tcpClient.Client));
+            _tcpClient.Client.BeginReceive(bufferList, SocketFlags.None, new AsyncCallback(ReceiveCallback), new ReceiveObject(bufferList, _tcpClient.Client));
         }
 
         private void ReceiveCallback(IAsyncResult asyncResult)
@@ -157,7 +189,7 @@ namespace VoiceChat
                     return;
                 }
 
-                AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
+                ReceiveObject asyncObj = (ReceiveObject)asyncResult.AsyncState;
                 var rslt = asyncObj.receiveObj[0];
                 var rsltSize = asyncObj.socket.EndReceive(asyncResult);
                 if (rsltSize > 0)
@@ -178,7 +210,7 @@ namespace VoiceChat
         /// <summary>
         /// 패킷송신
         /// </summary>
-        public void SendPacket(VoiceChatPacket voiceChatPacket)
+        public void SendPacket(VoiceChatPacket voiceChatPacket, UnityAction callback = null)
         {
             int nowPosition = 0;
             var sendBuffer = new TCPSendBuffer(4096 * 100);
@@ -209,7 +241,7 @@ namespace VoiceChat
             Buffer.BlockCopy(nowPositionByte, 0, rsltBuffer.Array, 0, nowPositionByte.Length);
             var rsltCloseBuffer = sendBuffer.CloseBuffer(nowPosition);
             Buffer.BlockCopy(rsltBuffer.Array, 0, rsltCloseBuffer.Array, 0, rsltCloseBuffer.Count);
-            SendPacket(rsltCloseBuffer);
+            SendPacket(rsltCloseBuffer, callback);
         }
 
         protected ArraySegment<byte> MakeHeader(int playerId, int playerChannel, int packetType, ArraySegment<byte> rsltBuffer, int sendDataSize, out int nowPosition)
@@ -314,8 +346,9 @@ namespace VoiceChat
 
         public void SessionClose()
         {
+            Debug.Log("접속을 종료합니다");
             _chConnected = 0;
-            if(_tcpClient.Connected)
+            if(_tcpClient != null && _tcpClient.Connected)
                 _tcpClient.Client.Close();
             OnClientConnected.RemoveAllListeners();
             OnClientDisconnected.RemoveAllListeners();
