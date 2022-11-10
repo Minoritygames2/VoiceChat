@@ -26,7 +26,7 @@ namespace VoiceChat
         
         public void StopTcpClient()
         {
-            _myVoicePlayer.StopVoicePlayer();
+            _myVoicePlayer.SendDisconnectRequest();
             _players.Clear();
         }
 
@@ -46,7 +46,10 @@ namespace VoiceChat
                     _myVoicePlayer.StartSendVoicePacket();
                     break;
                 case VoicePacketType.DISCONNECT_RESPONCE:
-                    Debug.Log(string.Format("네트워크 :: {0}번 플레이어 로그아웃", voicePacket.playerId));
+                    if (voicePacket.playerId == _myVoicePlayer.GetPlayerId())
+                        _myVoicePlayer.StopVoicePlayer();
+                    else
+                        Debug.Log(string.Format("네트워크 :: {0}번 플레이어 로그아웃", voicePacket.playerId));
                     break;
                 default:
                     break;

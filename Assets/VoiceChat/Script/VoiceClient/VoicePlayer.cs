@@ -45,10 +45,13 @@ namespace VoiceChat
             _micDataSet.SetVoiceData(voiceData.voiceArray, voiceData.voiceID, voiceData.voiceIndex);
         }
         
-        public void StopVoicePlayer()
+        public void SendDisconnectRequest()
         {
             //Disconnect 보내기
             _networkClient.SendPacket(new VoiceChatPacket(_playerId, VoicePacketType.DISCONNECT_REQUEST, 0, new byte[0]));
+        }
+        public void StopVoicePlayer()
+        {
             //접속끊기
             _networkClient.SessionClose();
             _micCapture.StopCapture();

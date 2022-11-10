@@ -106,7 +106,6 @@ namespace VoiceChat
 
             try
             {
-                
                 IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
                 bufferList.Add(buffer);
                 _tcpClient.Client.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), _tcpClient.Client);
