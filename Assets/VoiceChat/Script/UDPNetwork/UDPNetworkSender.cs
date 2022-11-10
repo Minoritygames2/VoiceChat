@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -36,7 +36,8 @@ namespace VoiceChat
 
         public void StopUDPSender()
         {
-            _udpClient.Close();
+            if(_udpClient.Client.Connected)
+                _udpClient.Close();
         }
 
         /// <summary>
