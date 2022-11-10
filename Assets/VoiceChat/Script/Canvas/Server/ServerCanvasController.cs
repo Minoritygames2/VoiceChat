@@ -27,6 +27,8 @@ namespace VoiceChat
         private Transform _logInPlayerTransform;
         [SerializeField]
         private GameObject _canvasPlayerItemPrefab;
+        [SerializeField]
+        private Text _txtPlayerCount;
 
         public void InitButtons(UnityAction<string> onStartBtnClick, UnityAction<string> onDetectBtnClick)
         {
@@ -86,6 +88,11 @@ namespace VoiceChat
             var canvasPlayer = Instantiate(_canvasPlayerItemPrefab, _logInPlayerTransform).GetComponent<CanvasPlayerItem>();
             canvasPlayer.InitPlayerItem(playerID);
             return canvasPlayer;
+        }
+
+        public void ChangePlayerCount(int playerCount)
+        {
+            _txtPlayerCount.text = string.Format("{0}명 접속중", playerCount);
         }
 
     }

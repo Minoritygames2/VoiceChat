@@ -49,6 +49,7 @@ namespace VoiceChat
             _voicePlayer.Add(newClient);
             newClient.InitVoicePlayer(_index, _canvasController.CreateCanvasPlayerItem(_index));
             newClient.NetworkClient.SendPacket(new VoiceChatPacket(0, VoicePacketType.ACCEPT, 0, BitConverter.GetBytes(_index)));
+            _canvasController.ChangePlayerCount(_voicePlayer.Count);
         }
 
         /// <summary>

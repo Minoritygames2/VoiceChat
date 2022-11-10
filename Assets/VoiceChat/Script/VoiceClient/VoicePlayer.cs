@@ -58,6 +58,7 @@ namespace VoiceChat
             //접속끊기
             _networkClient.SessionClose();
             _micCapture.StopCapture();
+            Destroy(_canvasItem.gameObject);
         }
     }
 
