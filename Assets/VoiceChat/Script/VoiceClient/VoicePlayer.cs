@@ -50,6 +50,8 @@ namespace VoiceChat
         
         public void SendDisconnectRequest()
         {
+            //상태를 Disconnect로 바꾸기 => 다른 Send를 하지않기위해 
+            _networkClient.RequestDisconnect();
             //Disconnect 보내기
             _networkClient.SendPacket(new VoiceChatPacket(_playerId, VoicePacketType.DISCONNECT_REQUEST, 0, new byte[0]));
         }

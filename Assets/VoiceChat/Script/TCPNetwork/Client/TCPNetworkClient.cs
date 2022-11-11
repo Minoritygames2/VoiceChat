@@ -130,6 +130,22 @@ namespace VoiceChat
             }
         }
 
+        public void RequestDisconnect()
+        {
+            _chConnected = 1;
+        }
+
+        public void SessionClose()
+        {
+            _chConnected = 0;
+            if (_tcpClient != null && _tcpClient.Connected)
+                _tcpClient.Client.Close();
+            OnClientConnected.RemoveAllListeners();
+            OnClientDisconnected.RemoveAllListeners();
+            OnReceiveVoicePacket.RemoveAllListeners();
+        }
+
+
         #endregion
 
         #region 수신
@@ -138,7 +154,7 @@ namespace VoiceChat
         /// </summary>
         public void StartClientBeginReceive()
         {
-            if (_isConnected != 2)
+            if (_isConnected == 0)
                 return;
             var receiveBuffer = new ArraySegment<byte>(new byte[4096 * 100], 0, 4096 * 100);
             IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
@@ -150,7 +166,7 @@ namespace VoiceChat
         {
             try
             {
-                if (_isConnected != 2)
+                if (_isConnected == 0)
                 {
                     StartClientBeginReceive();
                     return;
@@ -307,16 +323,6 @@ namespace VoiceChat
                     networkId = playerId, voiceID = voiceIdByte, voiceIndex = voiceIndex, voiceArray = message
                 }));
             }
-        }
-
-        public void SessionClose()
-        {
-            _chConnected = 0;
-            if(_tcpClient != null && _tcpClient.Connected)
-                _tcpClient.Client.Close();
-            OnClientConnected.RemoveAllListeners();
-            OnClientDisconnected.RemoveAllListeners();
-            OnReceiveVoicePacket.RemoveAllListeners();
         }
 
         private void OnDestroy()

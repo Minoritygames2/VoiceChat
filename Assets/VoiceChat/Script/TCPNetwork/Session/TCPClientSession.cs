@@ -49,6 +49,7 @@ namespace VoiceChat
                     _myVoicePlayer.StartSendVoicePacket();
                     break;
                 case VoicePacketType.DISCONNECT_RESPONCE:
+                    Debug.Log("in Packet Disconnect Response");
                     if (voicePacket.playerId == _myVoicePlayer.GetPlayerId())
                         _myVoicePlayer.StopVoicePlayer();
                     else
