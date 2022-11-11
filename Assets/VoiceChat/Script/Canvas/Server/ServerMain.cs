@@ -53,6 +53,7 @@ namespace VoiceChat
 
         private IEnumerator ISendDetectedPacket()
         {
+            _canvasController.StartDetectServer();
             while (_isSearch)
             {
                 yield return _wait;
@@ -64,7 +65,7 @@ namespace VoiceChat
                 if (_searchWaitTime > 100)
                     break;
             }
-
+            _canvasController.OnEndDetectedServer();
             OnEndDetectedServer();
         }
     }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace VoiceChat
 {
@@ -17,6 +18,11 @@ namespace VoiceChat
 
         [SerializeField]
         private ServerCanvasController _canvasController;
+
+        private ConcurrentQueue<VoicePlayer> _disConnectReqQueue = new ConcurrentQueue<VoicePlayer>();
+        private int _isAlbleDisConnectQueue = 0;
+        private int INT_ENABLE_DISCONNECT = 0;
+        private int INT_UNABLE_DISCONNECT = 1;
         protected override void OnReceivedPacket(VoiceChatPacket voicePacket)
         {
             switch(voicePacket.packetType)
@@ -30,7 +36,7 @@ namespace VoiceChat
                 case VoicePacketType.CONNECT_RESPONCE:
                     break;
                 case VoicePacketType.DISCONNECT_REQUEST:
-                    RemovePlayer(voicePacket.playerId);
+                    DisconnectResponse(voicePacket.playerId);
                     break;
                 case VoicePacketType.DISCONNECT_RESPONCE:
                     break;
@@ -55,16 +61,28 @@ namespace VoiceChat
         /// <summary>
         /// 클라이언트 접속종료
         /// </summary>
-        private void RemovePlayer(int playerId)
+        private void DisconnectResponse(int playerId)
         {
             if (AnyClient(playerId))
-            {
-                var disconnectClient = WhereClient(playerId);
-                _voicePlayer.Remove(disconnectClient);
-                var playerIdByte = BitConverter.GetBytes(playerId);
-                SendPacketToClient(new VoiceChatPacket(0, VoicePacketType.DISCONNECT_RESPONCE, 0, playerIdByte));
+                SendDisconnectResponseToClient(playerId);
+        }
 
-                Destroy(disconnectClient.gameObject);
+        private void SendDisconnectResponseToClient(int playerId)
+        {
+            var disconnectClient = WhereClient(playerId);
+            var playerIdByte = BitConverter.GetBytes(playerId);
+            for (int index = 0; index < _voicePlayer.Count; index++)
+            {
+                if (_voicePlayer[index].GetPlayerId() == playerId)
+                {
+                    _voicePlayer[index].NetworkClient.SendPacket(
+                           new VoiceChatPacket(0, VoicePacketType.DISCONNECT_RESPONCE, 0, playerIdByte)
+                           , () => { _voicePlayer.Remove(disconnectClient); });
+                    _disConnectReqQueue.Enqueue(_voicePlayer[index]);
+                    _voicePlayer[index].NetworkClient.RequestDisconnect();
+                }
+                else
+                    _voicePlayer[index].NetworkClient.SendPacket(new VoiceChatPacket(0, VoicePacketType.DISCONNECT_RESPONCE, 0, playerIdByte));
             }
         }
 
@@ -96,6 +114,28 @@ namespace VoiceChat
                 if (_voicePlayer[index].GetPlayerId() == playerId)
                     return _voicePlayer[index];
             return null;
+        }
+
+        private void Update()
+        {
+            if (_disConnectReqQueue.Count > 0)
+            {
+                if (Interlocked.CompareExchange(ref _isAlbleDisConnectQueue, INT_UNABLE_DISCONNECT, INT_ENABLE_DISCONNECT) == INT_UNABLE_DISCONNECT)
+                {
+                    VoicePlayer removePlayer;
+                    while (_disConnectReqQueue.Count > 0)
+                    {
+                        while (_disConnectReqQueue.TryDequeue(out removePlayer))
+                        {
+                            _voicePlayer.Remove(removePlayer);
+                            removePlayer.KickPlayer();
+                            Destroy(removePlayer.gameObject);
+                        }
+                    }
+                    Interlocked.Exchange(ref _isAlbleDisConnectQueue, INT_ENABLE_DISCONNECT);
+                    _canvasController.ChangePlayerCount(_voicePlayer.Count);
+                }
+            }
         }
     }
 } 

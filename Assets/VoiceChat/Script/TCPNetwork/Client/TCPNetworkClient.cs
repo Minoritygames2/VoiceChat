@@ -12,15 +12,36 @@ namespace VoiceChat
 {
     public class TCPNetworkClient : MonoBehaviour
     {
-        public class AsyncObject
+        public class ReceiveAsyncObject
         {
-            public AsyncObject(IList<ArraySegment<byte>> receiveObj, Socket socket)
+            public ReceiveAsyncObject(IList<ArraySegment<byte>> receiveData, Socket socket)
             {
-                this.receiveObj = receiveObj;
+                this.receiveData = receiveData;
                 this.socket = socket;
             }
-            public IList<ArraySegment<byte>> receiveObj;
+            public IList<ArraySegment<byte>> receiveData;
             public Socket socket;
+        }
+
+        public class SendAsyncObject
+        {
+            public SendAsyncObject(IList<ArraySegment<byte>> sendData, Socket socket)
+            {
+                this.sendData = sendData;
+                this.socket = socket;
+                hasCallback = false;
+            }
+            public SendAsyncObject(IList<ArraySegment<byte>> sendData, Socket socket, UnityAction callback)
+            {
+                this.sendData = sendData;
+                this.socket = socket;
+                hasCallback = true;
+                this.callback = callback;
+            }
+            public IList<ArraySegment<byte>> sendData;
+            public Socket socket;
+            public bool hasCallback;
+            public UnityAction callback;
         }
         #region 플레이어 세팅
         private int _playerId = 0;
@@ -99,16 +120,19 @@ namespace VoiceChat
         /// <summary>
         /// 패킷송신
         /// </summary>
-        private void SendPacket(ArraySegment<byte> buffer)
+        private void SendPacket(ArraySegment<byte> buffer, UnityAction callback = null)
         {
-            if (_isConnected != 2)
+            if (_isConnected == 0)
                 return;
 
             try
             {
                 IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
                 bufferList.Add(buffer);
-                _tcpClient.Client.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), _tcpClient.Client);
+                if(callback == null)
+                    _tcpClient.Client.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), new SendAsyncObject(bufferList, _tcpClient.Client));
+                else
+                    _tcpClient.Client.BeginSend(bufferList, SocketFlags.None, new AsyncCallback(SendCallback), new SendAsyncObject(bufferList, _tcpClient.Client, callback));
             }
             catch (Exception e)
             {
@@ -121,8 +145,10 @@ namespace VoiceChat
         {
             try
             {
-                Socket socket = (Socket)asyncResult.AsyncState;
-                var rsltSize = socket.EndSend(asyncResult);
+                SendAsyncObject asyncObj = (SendAsyncObject)asyncResult.AsyncState;
+                if (asyncObj.hasCallback)
+                    asyncObj.callback?.Invoke();
+                asyncObj.socket.EndSend(asyncResult);
             }
             catch (Exception e)
             {
@@ -159,7 +185,7 @@ namespace VoiceChat
             var receiveBuffer = new ArraySegment<byte>(new byte[4096 * 100], 0, 4096 * 100);
             IList<ArraySegment<byte>> bufferList = new List<System.ArraySegment<byte>>();
             bufferList.Add(receiveBuffer);
-            _tcpClient.Client.BeginReceive(bufferList, SocketFlags.None, new AsyncCallback(ReceiveCallback), new AsyncObject(bufferList, _tcpClient.Client));
+            _tcpClient.Client.BeginReceive(bufferList, SocketFlags.None, new AsyncCallback(ReceiveCallback), new ReceiveAsyncObject(bufferList, _tcpClient.Client));
         }
 
         private void ReceiveCallback(IAsyncResult asyncResult)
@@ -172,8 +198,8 @@ namespace VoiceChat
                     return;
                 }
 
-                AsyncObject asyncObj = (AsyncObject)asyncResult.AsyncState;
-                var rslt = asyncObj.receiveObj[0];
+                ReceiveAsyncObject asyncObj = (ReceiveAsyncObject)asyncResult.AsyncState;
+                var rslt = asyncObj.receiveData[0];
                 var rsltSize = asyncObj.socket.EndReceive(asyncResult);
                 if (rsltSize > 0)
                     _receiveQueue.Enqueue(new ArraySegment<byte>(rslt.Array, 0, rsltSize));
@@ -193,7 +219,7 @@ namespace VoiceChat
         /// <summary>
         /// 패킷송신
         /// </summary>
-        public void SendPacket(VoiceChatPacket voiceChatPacket)
+        public void SendPacket(VoiceChatPacket voiceChatPacket, UnityAction callback = null)
         {
             int nowPosition = 0;
             var sendBuffer = new TCPSendBuffer(4096 * 100);
@@ -224,7 +250,7 @@ namespace VoiceChat
             Buffer.BlockCopy(nowPositionByte, 0, rsltBuffer.Array, 0, nowPositionByte.Length);
             var rsltCloseBuffer = sendBuffer.CloseBuffer(nowPosition);
             Buffer.BlockCopy(rsltBuffer.Array, 0, rsltCloseBuffer.Array, 0, rsltCloseBuffer.Count);
-            SendPacket(rsltCloseBuffer);
+            SendPacket(rsltCloseBuffer, callback);
         }
 
         protected ArraySegment<byte> MakeHeader(int playerId, int playerChannel, int packetType, ArraySegment<byte> rsltBuffer, int sendDataSize, out int nowPosition)

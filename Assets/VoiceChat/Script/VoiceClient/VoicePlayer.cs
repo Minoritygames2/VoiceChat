@@ -60,6 +60,11 @@ namespace VoiceChat
             //접속끊기
             _networkClient.SessionClose();
             _micCapture.StopCapture();
+        }
+
+        public void KickPlayer()
+        {
+            _networkClient.SessionClose();
             Destroy(_canvasItem.gameObject);
         }
     }
